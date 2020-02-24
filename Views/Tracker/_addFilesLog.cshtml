@@ -1,0 +1,31 @@
+﻿<div class="row">
+    <div class="col-md-4">
+        <label for="uploadfiles">Upload Files </label>
+        <input type="file" class="form-control" multiple id="uploadfiles" name="uploadfiles" accept="file_extension|audio/*|video/*|image/*|media_type" />
+    </div>
+    <div class="col-md-4">
+        <label for="operationInstructions">Note </label>
+        <input type="text" rows="5" style="resize:none" class="form-control" id="operationInstructions" />
+    </div>
+    <div class="col-md-4">
+        <label for="uploadbutton">Action </label>
+        <input type="button" class="btn btn-success btn-sm form-control" id="uploadbutton" value="Upload"  />
+    </div>
+</div>
+
+<script type="text/javascript">
+    $("#uploadbutton").click(function () {
+            if ($('#selectrevision').val() == 0) {
+
+            } else {
+                if ($('#selectrevision').val() == 1) {
+                    var operation = parseInt($('#baseOperations').val());
+                    uploadFiles('#uploadfiles', operation, $("#requestId").html(), $("#operationInstructions").val(), parseInt($("#rivisionNo").html()) + 1, "#showUploadedFiles");
+                } else {
+                    var operation = parseInt($('#baseOperations').val()) + 9;
+                    uploadFiles('#uploadfiles', operation, $("#requestId").html(), $("#operationInstructions").val(), parseInt($("#rivisionNo").html()) + 1, "#showUploadedFiles");
+                }
+            
+            }
+        });
+</script>

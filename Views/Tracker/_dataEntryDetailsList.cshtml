@@ -1,0 +1,134 @@
+﻿@model DataEntry_Tracker.Models.CommonModel
+
+<table class="" width="100%" border="1">
+    <tbody>
+        <tr>
+            <th>Operation Name</th>
+            <td>@Model.BaseOperationName</td>
+        </tr>
+        <tr>
+            <th>Instruction</th>
+            <td>@Model.Instruction</td>
+        </tr>
+        <tr>
+            <th>Create Time</th>
+            <td>@Model.CreateDate.ToString("dd MMM yyyy h:mm:ss tt")</td>
+        </tr>
+        <tr>
+            <th>Assign To</th>
+            <td>@Model.UserName</td>
+        </tr>
+        <tr>
+            <th>Assign Time</th>
+            <td>
+                @if (Model.CoUpdatedBy != "")
+                {@DateTime.Parse(Model.CoUpdatedBy).ToString("dd MMM yyyy h:mm:ss tt")}
+            </td>
+        </tr>
+        <tr>
+            <th>Entry Started</th>
+            <td>
+                @if (Model.DataEntryCreated != "")
+                {@DateTime.Parse(Model.DataEntryCreated).ToString("dd MMM yyyy h:mm:ss tt")}
+            </td>
+        </tr>
+        <tr>
+            <th>Entry End</th>
+            <td>
+                @if (Model.DataEntryUpdated != "")
+                {@DateTime.Parse(Model.DataEntryUpdated).ToString("dd MMM yyyy h:mm:ss tt")}
+            </td>
+        </tr>
+        <tr>
+            <th>Progress</th>
+            @if (Model.Progress == 2)
+            {
+                <td style="color:red">Pending</td>
+            }
+            else
+            {
+                <td style="color:green">Processing</td>
+            }
+        </tr>
+    </tbody>
+</table>
+
+
+@if (Model.fileUploadModelsList != null)
+{
+    <table border="1" width="100%" style="text-align:center">
+        <caption>Files & Instructions</caption>
+        <tr>
+            <th>
+                No
+            </th>
+            <th>
+                File Name
+            </th>
+            <th>
+                Instructions
+            </th>
+            <th>
+                Action
+            </th>
+        </tr>
+        @{ int count = 1;}
+        @foreach (var item in Model.fileUploadModelsList)
+        {
+            <tr>
+                <td>
+                    @count
+                </td>
+                <td>
+                    @item.FileUploadName
+                </td>
+                <td>
+                    @item.Instructions
+                </td>
+                <td>
+                    @Html.ActionLink("Download", "DownloadFile", "Tracker", new { filepath = item.FileUploadPath.ToString(), filename = item.FileUploadName.ToString() }, new { @target = "_blank" })
+                </td>
+            </tr>
+            count++;
+        }
+
+    </table>
+}
+<p>Comments Section</p>
+<div id="comments_section" class="container" style="overflow-wrap:inherit; width:100%;overflow-y: scroll;height:100px;border:1px solid;margin-top:5px">
+    <table width="100%" id="coordinatorComments">
+    </table>
+
+</div>
+<table style="text-align:center;width:80%;margin-left:10%;margin-top:2px">
+    <tr>
+        <td style="width:80%"><input type="text" style="width:100%" id="commentsText" /></td>
+        <td style="width:20%"> <input type="button" style="padding:2px" value="Comments" class="btn btn-sm btn-success" onclick="InsertComments(@Model.RequestCodId)" /></td>
+    </tr>
+</table>
+<br />
+<div style="text-align:center">
+    @if (Model.Progress == 2)
+    {
+        <button type="button" style="width:30%" class="btn btn-success btn-sm" onclick="UpdateStartOrEnd(@Model.RequestCodId,3)">Start</button>
+        <button type="button" style="width:30%" class="btn btn-danger btn-sm" onclick="UpdateStartOrEnd(@Model.RequestCodId,7)">Returns</button>
+    }
+    else if (Model.Progress == 3 || Model.Progress == 5)
+    {
+        <button type="button" style="width:40%;background-color:yellow" class="btn btn-default btn-sm form-control" onclick="UpdateStartOrEnd(@Model.RequestCodId,4)">Pause</button>
+        <button type="button" style="width:30%" class="btn btn-success  btn-sm form-control" onclick="UpdateStartOrEnd(@Model.RequestCodId,6)">Complete</button>
+    }
+    else if (Model.Progress == 4)
+    {
+        <button type="button" style="width:30%" class="btn btn-info btn-sm form-control" onclick="UpdateStartOrEnd(@Model.RequestCodId,5)">Resume</button>
+
+    }
+</div>
+
+@*<script type="text/javascript">
+        $("#assignTodataentry").click(function () {
+            var assignname = $("#assignTo").val();
+            var requestId = parseInt($("#RequestCoId").val());
+            AssignRequestToDataEntry(requestId, assignname);
+        });
+    </script>*@

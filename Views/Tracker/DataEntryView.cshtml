@@ -1,0 +1,306 @@
+﻿
+@{
+    ViewBag.Title = "DataEntryView";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="~/Content/coordinatorstyle.css" rel="stylesheet" />
+<font size="2" face="Times New Roman">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2">
+                <ul class="nav">
+                    <li><a href="#" onclick="DataEntryRequest(2,2)">Pending Request</a></li>
+                    <li><a href="#" onclick="DataEntryRequest(3,2)">Processing Request </a></li>
+                    <li><a href="#" onclick="DataEntryRequest(4,2)">All Paused Request </a></li>
+                    <li><a href="#" onclick="DataEntryRequest(5,2)">All Resume Request </a></li>
+                    <li><a href="#" onclick="DataEntryRequest(6,2)">All Complete Request </a></li>
+                    <li><a href="#" onclick="DataEntryRequest(8,2)">All Closed Request </a></li>
+                </ul>
+            </div>
+            <div class="col-md-10">
+                <h3 style="text-align:center">Data Entry View</h3>
+                <div id="dataentryDashboard"> </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="online-popup" id="chatform">
+        <button type="button" class="chatbutton cancel" id="cancelChatbutton" onclick="closeForm()">See Users</button>
+
+        <div class="onlinechatcontainer">
+            <ul id="usersUl">
+            </ul>
+        </div>
+    </div>
+    <button class="open-button btn btn-success btn-sm" id="openchatbutton" onclick="openForm()" style="display:none">Online</button>
+
+    <div id="chat-popupuser">
+        <input type="button" class="form-control btn btn-info btn-sm cancel" id="removepopup" onclick="removeChatPopUp()" />
+        <div class="messagediv" id="messageshow"></div>
+        <input type="hidden" id="recevierId" value="" />
+        <table style="margin-top:5px" width="100%">
+            <tr>
+                <td width="80%"><input type="text" id="enterMessage" placeholder="" /></td>
+                <td width="20%"><button class="btn btn-sm btn-info" type="button" id="sendmessageuser"><span class="glyphicon glyphicon-send"></span></button></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="modal" id="modal_preview">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Request Number: <input id="RequestCoId" type="text" style="border:none;background:none" disabled /> </h4>
+                </div>
+                <div id="modalbody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+</font>
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script type="text/javascript">
+    var t;
+
+    $("#sendmessageuser").click(function () {
+        if ($("#enterMessage").val().length<1) {
+             $("#enterMessage").attr({ "placeholder": "enter message" });
+        } else {
+            var message = $("#enterMessage").val();
+            saveChatMessage(parseInt($("#recevierId").val()), message, "#messageshow");
+            $("#enterMessage").val("");
+        }
+    });
+    function DataEntryRequest(status,dataco) {
+        var urlpath = '@Url.Action("GetPendingRequest", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { Pending: status, DataOrCo: dataco },
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $('#dataentryDashboard').empty();
+                            $('#dataentryDashboard').html(data);
+                            //$('#pendigcotablelist').DataTable();
+                             $('#dataEntryPartial').DataTable( {
+                                         "order": [[ 0, "desc" ]]
+                             });
+                        }
+
+                },
+                error: function () {
+                    swal({
+                        title: 'Something Went Wrong!!',
+                        type: 'error',
+                        closeOnCancel: true
+                    });
+                }
+            });
+    }
+
+         @*var urlpath = '@Url.Action("GetPendingRequest", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {  },
+                async: true,
+                    success: function(data) {
+                        if (data) {
+                            $('#coordinatorDashboard').empty();
+                            $('#coordinatorDashboard').html(data);
+                           $("#pendigcotablelist").DataTable();
+                           // $("#requestCoordinatiorTable").DataTable();
+                        }
+                    }
+            });*@
+    function openForm() {
+        document.getElementById("chatform").style.display = "block";
+         $("#openchatbutton").hide();
+         $("#cancelChatbutton").show();
+         allTrackerUsers(15);
+
+    }
+
+    function allTrackerUsers(module) {
+        var urlpath = '@Url.Action("GetTrackerUser", "Tracker")';
+                $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { Module:module},
+                async: true,
+                success: function (data) {
+                    if (data) {
+                        $("#usersUl").empty();
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].UserTypeId == 1) {
+                                $("#usersUl").append('<li><a href="#" onclick="openChatPopUp(' + data[i].UserInformationId + ',\'' + data[i].UserInformationName + '\')"  >' + data[i].UserInformationName + '</a><span style="color:#FF0000">(' + data[i].UserTypeId+')</span></li>');
+                            } else {
+                                $("#usersUl").append('<li><a href="#" onclick="openChatPopUp(' + data[i].UserInformationId + ',\'' + data[i].UserInformationName + '\')"  >' + data[i].UserInformationName + '</a></li>');
+                            }
+
+                        }
+                    }
+                }
+                });
+    }
+    function closeForm() {
+        document.getElementById("chatform").style.display = "none";
+        $("#openchatbutton").show();
+        $("#cancelChatbutton").hide();
+    }
+    function openChatPopUp(userId, userName) {
+        clearInterval(t);
+        $("#chat-popupuser").show();
+        $("#removepopup").val(userName);
+        $("#recevierId").val(userId);
+        getChattingMessage(userId, "#messageshow");
+        t = setInterval(function () { getChattingMessage(userId, "#messageshow");}, 1000);
+    }
+    function removeChatPopUp() {
+        $("#chat-popupuser").hide();
+        clearInterval(t);
+    }
+    function saveChatMessage(sendto, message, messagediv) {
+        var urlpath = '@Url.Action("SaveChatMessageToDatabase", "Tracker")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: { SendTo: sendto, Message: message },
+            async: true,
+            success: function (data) {
+                if (data) {
+                    getChattingMessage(sendto, messagediv);
+                }
+            }
+        });
+    }
+    function getChattingMessage(sendto, messageDiv) {
+        allTrackerUsers(15);
+        var urlpath = '@Url.Action("GetAllChattingMessage", "Tracker")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: { SendTo: sendto },
+            async: true,
+            success: function (data) {
+                if (data) {
+                    $(messageDiv).empty();
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].UserId != sendto) {
+                            var messages = '<p style="margin:1px;text-align:right;color:blue;padiing-right:1px" >' + data[i].Message + '</p>';
+                        } else {
+                            var messages = '<p style="margin:1px;text-align:left;padiing-left:1px">' + data[i].Message + '</p>';
+                        }
+                        $(messageDiv).append(messages);
+                    }
+                    $(messageDiv).scrollTop(99999);
+                }
+            }
+        });
+    }
+
+    function UpdateStartOrEnd(requestedId,progress) {
+        var urlpath = '@Url.Action("DataEntryUpdateTime", "Tracker")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: { RequestId: requestedId , Progress:progress},
+            async: true,
+            success: function (data) {
+                if (data) {
+                    swal({
+                        title: 'Done',
+                        type: 'success',
+                        closeOnCancel: true
+                    }, function () {
+                        DataEntryRequest(2, 2);
+                        $('#modal_preview').modal('hide');
+                    });
+                } else {
+                    swal({
+                        title: "Plase pause Or finish the Current Job First !!!!",
+                        type: 'error',
+                        closeOnCancel: true
+                    });
+                }
+            }
+        });
+    }
+
+
+    function GetDetailsInformationBYRequestId(requestId,reqCod,oper,revi) {
+        var urlpath = '@Url.Action("GetCoordinatorFilesDatabase", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { RequestId: requestId, Reqcod: reqCod, OperationId:oper, Revision:revi,Partial:"_dataEntryDetailsList"},
+                async: true,
+                success: function (data) {
+                        if (data) {
+                            $('#modalbody').empty();
+                            $('#modalbody').html(data);
+                            $('#RequestCoId').val(reqCod);
+                            CommentsTable(reqCod);
+                        }
+                        $('#modal_preview').show();
+                    }
+                });
+    }
+
+
+     function InsertComments(requestId) {
+        if ($("#commentsText").val().length < 1) {
+
+        } else {
+            var comments = $("#commentsText").val();
+            var urlpath = '@Url.Action("InsertComments", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { RequestId: requestId, Comments: comments },
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $("#commentsText").val("");
+                            CommentsTable(requestId);
+                        }
+                    }
+                });
+        }
+        
+    }
+     function CommentsTable(requestId) {
+            var urlpath = '@Url.Action("ReadAllComments", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { RequestId: requestId },
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $("#coordinatorComments").empty();
+                            for (var i = 0; i < data.length; i++) {
+                                        var newRow = $('<tr>');
+                                        var cols = "";
+                                        cols += '<td style="width:20%;color:blue">' + data[i].UserName + '</td>';
+                                        cols += '<td style="width:30%;">' + data[i].CreateTime + '</td>';
+                                        cols += '<td style="width:50%;word-break: break-word">' + data[i].ReviewMessage + '</td></tr>';
+                                newRow.append(cols);
+                                $("#coordinatorComments").append(newRow);
+                            }
+                            
+                        }
+                    }
+                });    
+    }
+</script>
+

@@ -1,0 +1,85 @@
+﻿/* Button used to open the chat form - fixed at the bottom of the page */
+.open-button {
+    background-color: #555;
+    color: white;
+    border: none;
+    cursor: pointer;
+    opacity: 0.8;
+    position: fixed;
+    bottom: 10px;
+    width: 200px;
+}
+
+/* The popup chat - hidden by default */
+.online-popup {
+    display: none;
+    position: fixed;
+    bottom: 10px;
+    border: 1px solid #139203;
+    z-index: 0;
+    height: 300px;
+}
+.chatbutton{
+    height: 30px;
+    background-color: #139203;
+    width: 100%;
+    border: none;
+    font-weight: bold;
+    color: white;
+}
+
+#chat-popupuser {
+    display: none;
+    position: fixed;
+    bottom: 10px;
+    border: 1px solid #5fabdf;
+    z-index: 0;
+    height: 300px;
+    margin-left: 230px;
+    background-color: white;
+}
+/* Add styles to the form container */
+.onlinechatcontainer {
+    width: 220px;
+    padding: 2px;
+    background-color: white;
+    
+}
+
+#usersUl {
+    list-style: none;
+    overflow-y: auto;
+    height: 280px;
+
+}
+
+    #usersUl li::before {
+        content: "\2022";
+        color: green;
+        font-weight: bold;
+        display: inline-block;
+        width: 1em;
+        margin-left: -1em;
+    }
+.messagediv {
+    width:210px;
+    height: 225px;
+    overflow-y: auto;
+   
+    overflow-x: hidden;
+    overflow-wrap: break-word;
+    
+}
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .messagediv::-webkit-scrollbar {
+        display: none;
+    }
+
+/* Hide scrollbar for IE and Edge */
+.messagediv {
+    -ms-overflow-style: none;
+}
+
+.form-control, .btn {
+    border-radius: 0px;
+}

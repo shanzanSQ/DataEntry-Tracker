@@ -1,0 +1,183 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+@{
+    ViewBag.Title = "Home Page";
+}
+    <script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<div class="container">
+    <h3 style="text-align:center">User Profile</h3>
+    <div class="col-md-8">
+        <table width="100%">
+            <tr>
+                <td><label for="userName">Name </label></td>
+                <td> <h5 id="userName"></h5></td>
+            </tr>
+            <tr>
+                <td><label for="useremail">User Email </label></td>
+                <td> <h5 id="useremail"></h5></td>
+            </tr>
+            <tr>
+                <td><label for="userphone">User Phone Number </label></td>
+                <td> <h5 id="userphone"></h5></td>
+            </tr>
+            <tr>
+                <td><label for="sqidnumber">SQ ID Number </label></td>
+                <td> <h5 id="sqidnumber"></h5></td>
+            </tr>
+            <tr>
+                <td><label for="designation">Designation  </label></td>
+                <td> <h5 id="designation"></h5></td>
+            </tr>
+        </table>
+
+    </div>
+    <div class="col-md-4">
+        <input type="button" style="width:50%" onclick="ChangePass()" value="Change Password" class="btn btn-info form-control" />
+        <div id="changepassdiv" hidden>
+            <label for="oldPass">Type Old Password</label>
+            <input type="password" id="oldPassword" name="oldPassword" class="form-control" />
+            <label for="newpass">Type New Password</label>
+            <input type="password" id="newpassword" placeholder="pattern Xxxxxx1" name="newpassword" class="form-control" />
+            <label for="confirmpass">Confirm New Password</label>
+            <input type="password" id="confirmpassword" placeholder="pattern Xxxxxx1" name="confirmpassword" class="form-control" />
+            <br />
+            <input type="button" onclick="passwordChange()" id="confirmPas" value="Change Password" class="btn btn-success" />
+            @*<a href="#" id="recoverypass">Forgot Password</a>*@
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+         window.onload = function () {
+           var urlpath = '@Url.Action("GetUserInformation", "Home")';
+             $.ajax({
+                 url: urlpath,
+                 type: "Post",
+                 success: function (response) {
+                     $('#userName').html(response.UserInformationName);
+                     $('#useremail').html(response.UserInformationEmail);
+                     $('#userphone').html(response.UserInformationPhoneNumber);
+                     $('#sqidnumber').html(response.UserSQNumber);
+                     $('#designation').html(response.DesignationName);
+                 }
+             });
+        }
+        function ChangePass() {
+            if ($('#changepassdiv').is(':visible') ) {
+                $('#changepassdiv').hide();
+            } else {
+                $('#changepassdiv').show();
+            }
+        }
+
+        $('#recoverypass').click(function () {
+            swal({
+                title: 'Are you sure?',
+                text: "This will Send your password to your mail",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes'
+            },function () {
+                RecoveryPassword();
+            });
+        });
+        function RecoveryPassword() {
+                var urlpath = '@Url.Action("RecoveryPassword", "Home")';
+                $.ajax({
+                    url: urlpath,
+                    dataType: 'json',
+                    type: "Post",
+                    data: {},
+                    async: true,
+                    success: function (data) {
+                        if (data) {
+                            swal({
+                                title: 'Password Sent to your email',
+                                type: 'success',
+                                closeOnCancel: true
+                            },
+                                function () {
+                                    window.location.href = '@Url.Action("Index", "Account")';
+                                });
+                        } else {
+                            swal({
+                                title: 'Something Wrong,Please Try Again',
+                                type: 'error',
+                                closeOnCancel: true
+                            });
+                        }
+                    }
+                });
+        }
+
+        function passwordChange() {
+            var oldpass = $('#oldPassword').val();
+            var email = $('#useremail').html();
+            var newpass=$('#newpassword').val();
+            var confirmpass = $('#confirmpassword').val();
+            if ($('#oldPassword').val().length < 6) {
+                swal({
+                    title: 'Type current Password',
+                    type: 'error',
+                    closeOnCancel: true
+                });
+            }else if (!CheckPassword(newpass)) {
+                swal({
+                    title: 'Password At least 6 charecters, at least one numeric digit, one uppercase and one lowercase letter',
+                    type: 'error',
+                    closeOnCancel: true
+                });
+            }else if ($.trim(newpass) == $.trim(confirmpass)) {
+                var urlpath = '@Url.Action("ChangePassword", "Home")';
+                $.ajax({
+                    url: urlpath,
+                    dataType: 'json',
+                    type: "Post",
+                    data: { email: email, oldpass: oldpass, newpass: newpass },
+                    async: true,
+                    success: function (data) {
+                        if (data) {
+                            swal({
+                                title: 'Password Successfully Changed',
+                                type: 'success',
+                                closeOnCancel: true
+                            },
+                                function () {
+                             window.location.href = '@Url.Action("Index", "Account")';
+                                });
+                        } else {
+                            swal({
+                                title: 'OLD Password are Not correct',
+                                type: 'error',
+                                closeOnCancel: true
+                             });
+                        }
+                    }
+                });
+            } else {
+                swal({
+                    title: 'Please Make sure New password and confirm Password are Same',
+                    type: 'error',
+                    closeOnCancel: true
+                });
+            }
+        }
+
+        function CheckPassword(inputtxt)
+        {
+            var passw = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/;
+            if(inputtxt.match(passw))
+            {
+              return true;
+            }
+            else
+            {
+
+             return false;
+            }
+        }
+
+
+</script>

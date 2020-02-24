@@ -1,0 +1,52 @@
+﻿@model IEnumerable<DataEntry_Tracker.Models.CommonModel>
+    <div class="box">
+        <table class="table table-striped" id="pendigcotablelist">
+            <thead>
+                <tr>
+                    <th>Request Id</th>
+                    <th>Task Id</th>
+                    <th>Operaration Name</th>
+                    <th>Unit Name</th>
+                    <th>Buyer Name</th>
+                    <th>Session Name</th>
+                    <th>Style Name </th>
+                    <th>SLA</th>
+                    <th>Requested By</th>
+                    <th>Priority</th>
+                    <th>Create Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                <tr>
+                    <td>@item.RequestId</td>
+                    <td>@item.RequestCodId</td>
+                    <td>@item.BaseOperationName</td>
+                    <td>@item.UnitName</td>
+                    <td>@item.BuyerName</td>
+                    <td>@item.SeasonName</td>
+                    <td>@item.StyleName</td>
+
+                    <td>@item.RequestTime min</td>
+                    <td>@item.UserName</td>
+                    <td>@item.Priority</td>
+                    <td>@item.CreateDate.ToString("dd MMM yyyy h:mm tt")</td>
+                    <td>
+                        @if (item.Progress == 1)
+                        {
+                            <button type="button" class="btn  btn-block btn-success btn-sm" data-toggle="modal" data-target="#modal_preview" onclick="CoordinatordetailsView(@item.RequestId,@item.RequestCodId,@item.BaseOperationId,@item.RivisionNo,0)">Details </button>
+                        }
+                        else 
+                        {
+                            <button type="button" class="btn  btn-block btn-info btn-sm" data-toggle="modal" data-target="#modal_preview" onclick="GetDetailsInformationBYRequestId(@item.RequestId,@item.RequestCodId,@item.BaseOperationId,@item.RivisionNo)">Preview</button>
+                        }
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    
+ 

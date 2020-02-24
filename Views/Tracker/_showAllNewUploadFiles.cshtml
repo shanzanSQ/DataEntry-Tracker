@@ -1,0 +1,44 @@
+﻿@model IEnumerable<DataEntry_Tracker.Models.FileUploadModel>
+
+<table class="table">
+    <tr>
+        <th>
+            NO
+        </th>
+        <th>
+            Operation Name
+        </th>
+        <th>
+            File Name
+        </th>
+        <th>
+            Instructions
+        </th>
+        <th>
+            Action
+        </th>
+    </tr>
+    @{ int count = 1;}
+    @foreach (var item in Model)
+    {
+<tr>
+    <td>
+        @count
+    </td>
+    <td>
+        @item.OperationName
+    </td>
+    <td>
+        @item.FileUploadName
+    </td>
+    <td>
+        @item.Instructions
+    </td>
+    <td>
+        @Html.ActionLink("Download", "DownloadFile", "Tracker", new { filepath = item.FileUploadPath.ToString(), filename = item.FileUploadName.ToString() }, new { @target = "_blank" })
+    </td>
+</tr>
+        count++;
+    }
+
+</table>

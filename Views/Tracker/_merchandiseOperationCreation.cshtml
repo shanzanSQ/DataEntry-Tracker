@@ -1,0 +1,322 @@
+﻿@model DataEntry_Tracker.Models.CommonModel
+<style>
+    .tableshow {
+        width: 100%;
+    }
+</style>
+@if (Model.RequestId > 0)
+{
+    <div>
+        <table class="table table-bordered table-responsive">
+            <tr>
+                <th>Request Id</th>
+                <th>Unit Name </th>
+                <th>Buyer Name</th>
+                <th>Session Name </th>
+                <th>Style Name</th>
+                <th>Rivision No</th>
+                <th>Instructions</th>
+            </tr>
+            <tr>
+                <td id="requestId">@Model.RequestId</td>
+                <td>@Model.UnitName</td>
+                <td>@Model.BuyerName</td>
+                <td>@Model.SeasonName</td>
+                <td>@Model.StyleName</td>
+                <td id="rivisionNo">@Model.RivisionNo</td>
+                <td style="overflow-wrap:break-word">@Model.Instruction</td>
+            </tr>
+        </table>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="baseOperations">Operations</label>
+                        <select id="baseOperations" class="form-control" onchange="colorChange('#baseOperations')"></select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="selectrevision">Operation Type</label>
+                        <select id="selectrevision" class="form-control" onchange="colorChange('#selectrevision')">
+                            <option value="0">--Select Revision--</option>
+                            <option value="1">New Creation</option>
+                            <option value="2">Revision</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="noofTransections">No Of Transections</label>
+                        <input type="text" id="noofTransections" class="form-control" onchange="colorChange('#noofTransections')" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="priority">Add Priority </label>
+                        <select id="priority" class="form-control">
+                            <option value="1">Default</option>
+                            <option value="2">Urgent</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="addfiles">Action</label>
+                        <input type="button" class="btn btn-info btn-sm form-control" id="addfiles" value="Add Files" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="modalInstruction">Instructions </label>
+                        <textarea type="text" rows="5" style="resize:none" class="form-control" id="modalInstruction" />
+                    </div>
+                </div>
+                <div class="row" style="text-align:center">
+                    <br />
+                    <input type="button" value="Submit Task" class="btn btn-sm btn-success" id="buttonTaskSubmit" onclick="submitTracker(@Model.RequestId)" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div style="overflow-y:scroll;height:300px;text-align:center;width:100%" class="col-md-6" id="fileUploadList">
+                    <table id="showUploadedFiles" class="tableshow" border="1">
+                        <caption>Uploaded Files </caption>
+                        <tr>
+                            <th>Operation Name </th>
+                            <th> File Name </th>
+                            <th> Notes </th>
+                            <th>Action</th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <br />
+        @if (Model.RevisionList != null)
+        {
+            <div style="overflow-y:auto;max-height:300px;" class="col-md-12">
+                <table class="table" style="text-align:center">
+                    <tr>
+                        <th>
+                            Task ID
+                        </th>
+                        <th>
+                            Operation Name
+                        </th>
+                        <th>
+                            SLA
+                        </th>
+                        <th>
+                            No Of Transaction
+                        </th>
+                        <th>
+                            Create Time
+                        </th>
+                        <th>
+                            Priority
+                        </th>
+                        <th>
+                            Instruction
+                        </th>
+                        <th>
+                            Progress
+                        </th>
+                    </tr>
+                    @{ int count = 1;}
+                    @foreach (var item in Model.RevisionList)
+                    {
+                        <tr>
+                            <td>
+                                @item.RequestCodId
+                            </td>
+                            <td>
+                                @item.BaseOperationName
+                            </td>
+                            <td>
+                                @item.RequestTime min
+                            </td>
+                            <td>
+                                @item.NoOfTransections
+                            </td>
+                            <td>
+                                @item.CreateDate
+                            </td>
+                            <td>
+                                @item.Priority
+                            </td>
+                            <td style="width:20%;overflow-wrap:break-word">
+                                @item.Instruction
+                            </td>
+                            <td>
+                                @if (item.AssignTo == "Update")
+                                {
+                                    <input type="button" data-toggle="modal" data-target="#modalTaskPreview" class="btn btn-danger btn-sm" onclick="GetInformationBYRequest(@item.RequestId,@item.RequestCodId,@item.BaseOperationId,@item.RivisionNo)" value="@item.AssignTo" />
+                                }
+                                else
+                                {
+                                    <input type="button" data-toggle="modal" data-target="#modalTaskPreview" class="btn btn-success btn-sm" onclick="GetInformationBYRequest(@item.RequestId,@item.RequestCodId,@item.BaseOperationId,@item.RivisionNo)" value="@item.AssignTo" />
+                                }
+                            </td>
+                        </tr>
+                        count++;
+                    }
+
+                </table>
+            </div>
+        }
+    </div>
+}else
+{
+    <h1 style="color:red;text-align:center">No Request Found With This Request Id</h1>
+}
+
+@*<div style="margin-top:20px;margin-bottom:20px;text-align:center" class="row">
+        <button class="btn btn-danger" id="cancel_button">Cancel</button>
+        <button id="next_button" class="btn btn-info">Next</button>
+    </div>*@
+<script type="text/javascript">
+    LoadBaseOperations();
+    function LoadBaseOperations() {
+        var urlpath = '@Url.Action("GetAllBaseOperationsDatabase", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {},
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                           $('#baseOperations').empty();
+                           $('#baseOperations').append("<option value='0'>--Select Operation--</option>");
+                            for (var i = 0; i < data.length; i++) {
+                                $("#baseOperations").append($("<option></option>").val(data[i].BaseOperationId)
+                                    .html(data[i].BaseOperationName));
+                            }
+                        }
+                    }
+                });
+    }
+    function DeleteFile(fileuploadId) {
+         var urlpath = '@Url.Action("DeleteFiles", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {FileuploadId:fileuploadId},
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $("tr#" + fileuploadId + "").remove();
+                        }
+                    }
+                });
+    }
+    $("#baseOperations").click(function () {
+        var count = $('#showUploadedFiles tr').length;
+        if (count > 1) {
+            swal({
+                title: 'Please Submit this request before Change Operations or delete Uploaded files',
+                type: 'error',
+                closeOnCancel: true
+            },function () {
+                $("#baseOperations option:selected");    
+            });
+            
+        }
+    });
+    $("#selectrevision").click(function () {
+        var count = $('#showUploadedFiles tr').length;
+        if (count > 1) {
+            swal({
+                title: 'Please Submit this request before Change Operations or delete Uploaded files',
+                type: 'error',
+                closeOnCancel: true
+            },function () {
+                $("#selectrevision option:selected");    
+            });
+            
+        }
+    });
+    //    .change(function () {
+    //    var count = $('#showUploadedFiles tr').length;
+        
+    //    if (count>1) {
+    //        swal({
+    //            title: 'Please Submit this request Then Change Operations',
+    //            type: 'error',
+    //            closeOnCancel: true
+    //        });
+    //        $("#baseOperation").val(previous);
+    //    }
+    //});
+    //$("#next_button").click(function () {
+    //    showAllUploadedFiles($("#requestId").html().trim(),1);
+    //});
+    function colorChange(elem) {
+        $(elem).css({ "border-color": "#d3d3d3" });
+    }
+    $("#addfiles").click(function () {
+        if ($("#baseOperations").val() == "0") {
+            $('#baseOperations').css({ "border-color": "#FF0000" });
+        } else if ($("#selectrevision").val() == "0") {
+            $('#selectrevision').css({ "border-color": "#FF0000" });
+        } else if (!$.isNumeric($("#noofTransections").val())) {
+            $('#noofTransections').css({ "border-color": "#FF0000" });
+        } else {
+            var urlpath = '@Url.Action("ChangeDivView", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {status:4},
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $('#modalbody').empty();
+                            $('#modalbody').html(data);
+                            $("#modal_preview").modal("show");
+                        }
+                    }
+            });
+        }
+    });
+
+    $("#idSubmit").click(function () {   
+            submitTracker($("#requestId").html().trim()); 
+    });
+
+
+    function GetInformationBYRequest(requestId,reqCod,oper,revi) {
+        var urlpath = '@Url.Action("GetCoordinatorFilesDatabase", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { RequestId: requestId, Reqcod: reqCod, OperationId:oper, Revision:revi,Partial:"_merchandShowTaskPreview"},
+                async: true,
+                success: function (data) {
+                        if (data) {
+                            $('#modaltaskbody').empty();
+                            $('#modaltaskbody').html(data);
+                            $('#modalTaskPreview').show();
+                            $('#RequestCoId').val(reqCod);
+                            CommentsTable(reqCod);
+                        }
+
+                    }
+                });
+    }
+
+    function UpdateStartOrEnd(requestedId,progress,masterID) {
+        var urlpath = '@Url.Action("DataEntryUpdateTime", "Tracker")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: { RequestId: requestedId , Progress:progress},
+            async: true,
+            success: function (data) {
+                if (data) {
+                    swal({
+                        title: 'Done',
+                        type: 'success',
+                        closeOnCancel: true
+                    }, function () {
+                        GetDetailsInformationBYRequestId(masterID);
+                        $('#modalTaskPreview').modal('hide');
+                    });
+                }
+            }
+        });
+    }
+</script>

@@ -1,0 +1,59 @@
+﻿<style>
+    th{
+        text-align:center;
+    }
+</style>
+<div >
+    <div class="row">
+        <div class="col-md4">
+            <h4>Currently Working</h4>
+            <table width="100%" id="currentlyworkingdiv" border="1" class="table table-striped" style="text-align:center" >
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    CurrentlyWorking(0);
+
+    interval=setInterval(function(){
+        CurrentlyWorking(0);
+    }, 30000);
+    function CurrentlyWorking(progress) {
+        var urlpath = '@Url.Action("DataEntryCurrentProcess", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { Process: progress },
+                async: true,
+                    success: function(data) {
+                        if (data) {
+                            $('#currentlyworkingdiv').empty();
+                            var newRow = $('<tr > <th width="15%">Operator Name </th><th width="15%">Operation Name </th><th width="10%">SLA Count </th><th width="10%">No Of Transections</th><th width="20%">Work Started </th><th width="10%">Total Work </th><th width="20%">Percentage</th></tr>');
+                            $("#currentlyworkingdiv").append(newRow);
+                            for (var i = 0; i < data.length; i++) {
+                                var color = "";
+                                if (data[i].WorkPercentage >= 0 && data[i].WorkPercentage < 50) {
+                                    color = '#11C8CF';
+                                } else if (data[i].WorkPercentage >= 50 && data[i].WorkPercentage < 80) {
+                                    color='#F05705'
+                                } else {
+                                    color='#169706'
+                                }
+
+                                    var newRow = $('<tr >');
+                                    var cols = "";
+                                        cols += '<td>' + data[i].AssignTo + '</td>';
+                                        cols += '<td>' + data[i].BaseOperationName + '</td>';
+                                        cols += '<td>' + data[i].RequestTime + 'min</td>';
+                                        cols += '<td>' + data[i].NoOfTransections + '</td>';
+                                        cols += '<td>' + data[i].DataEntryCreated + '</td>';
+                                        cols += '<td>' + data[i].WorkProgress + 'min</td>';
+                                        cols += '<td><strong style="color:'+color+'">'+data[i].WorkPercentage+ '%</strong></td></tr>';
+                                        newRow.append(cols);
+                                     $("#currentlyworkingdiv").append(newRow);
+                                 } 
+                        }
+                    }
+            });
+    }
+</script>

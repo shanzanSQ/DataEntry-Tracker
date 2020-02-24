@@ -1,0 +1,104 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - SQ Data Entry Tracker</title>
+    <link href="~/Content/sweetalert.css" rel="stylesheet" />
+    <!-- DataTables -->
+    <link href="~/Content/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    @Styles.Render("~/Content/bootstrap.min.css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <p class="site-title">
+                    <a href="@Url.Action("Index", "Home")">
+                        <img style="padding-top:12px;width:30px;height:40px;" src="../../Images/logo.png" alt="" />
+                        <img style="padding-top:20px;width:80px;" src="../../Images/slogan.png" alt="" />
+                    </a>
+                </p>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul id="top_menu" class="nav navbar-nav navbar-left">
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li>@Html.ActionLink(@Session["TrackerUserInfo"].ToString(), "Index", "Home")</li>
+                    <li id="logoutButton">
+                        <a>
+                            Log off
+                            <span class="glyphicon glyphicon-log-out"></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid body-content" style="margin-top:60px">
+        @RenderBody()
+        
+        <footer>
+           
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+    <script>
+        ModuleWiseMenu();
+        function ModuleWiseMenu() {
+            var origin = window.location.origin;
+             var urlpath = '@Url.Action("LoadPermissionMenu", "Account")';
+            $.ajax({
+                url: urlpath,
+                dataType: 'json',
+                type: "Post",
+                data: {},
+                async: true,
+                success: function (data) {
+                    $('#top_menu').empty();
+                    for (var i = 0; i < data.length; i++) {
+                        $("#top_menu").append('<li><a href="' + origin+'/'+data[i].ModuleController +'/'+data[i].ModuleValue+ '">' + data[i].ModuleName + '</a></li>');
+                    }
+                }
+            });
+        }
+
+        $("#logoutButton").click(function () {
+        var urlpath = '@Url.Action("Logout", "Account")';
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                data: {},
+                dataType: 'json',
+                url: urlpath,
+                type: "Post",
+                async: true,
+                success: function (result) {
+                if (result) {
+                    swal({
+                                    title: 'Log out Successfully',
+                                    type: 'success',
+                                    closeOnCancel: true
+                                },
+                        function () {
+                             window.location.href = '@Url.Action("Index", "Account")';
+                                });
+                }
+            }
+        });
+        });
+    </script>
+    <script src="~/Content/datatables.net/js/jquery.dataTables.min.js"></script>
+    <!-- DataTables -->
+    <script src="~/Content/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="~/Scripts/sweetalert.min.js"></script>
+</body>
+</html>

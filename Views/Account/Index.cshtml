@@ -1,0 +1,158 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = null;
+
+}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title> SQ GROUP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content=" Master  Login Form Widget Tab Form,Login Forms,Sign up Forms,Registration Forms,News letter Forms,Elements" />
+    <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
+    <link href="~/Content/style.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/sweetalert.css" rel="stylesheet" />
+    <link href="//fonts.googleapis.com/css?family=Cormorant+SC:300,400,500,600,700" rel="stylesheet">
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i" rel="stylesheet">
+</head>
+
+<body>
+    <div class="logo">
+        <a href="http://sqgc.com/"><img width="100" src="@Url.Content("~/images/logo.png")" /></a>
+    </div>
+    <div class="slogan">
+        <p align="center">
+            <img width="140" src="@Url.Content("~/images/slogan.png")" />
+        </p>
+    </div>
+    <h1 style="color:#FFFFFF;"><strong>DATA ENTRY SERVICE TRACKER</strong></h1>
+
+    <div class="design-w3l">
+        <div class="mail-form-agile">
+                <input type="text" name="name" id="user_email" placeholder="User Name  or  email..." required="" />
+                <input type="password" name="password" id="user_password" class="padding" placeholder="Password" required="" />
+                <input type="submit" class="btn btn-success" id="login_button" value="login">
+        </div>
+        <div class="clear">
+            <a href="#" style="color:#FFFFFF" id="recoverypass">Forgot Password</a>
+        </div>
+    </div>
+
+    <div style="margin-bottom:30px" class="footer">
+        <p style="color:white"><strong>copyright  version of <a style="color:white" href="https://www.sqgc.com/"> SQ Group 2020 </a></strong> </p>
+    </div>
+</body>
+</html>
+@Scripts.Render("~/bundles/jquery")
+<script src="~/Scripts/sweetalert.min.js"></script>
+<script type="text/javascript">
+
+    $(document).keypress(function(e) {
+        if (e.keyCode == 13) {
+             var name = $("#user_email").val();
+            var pass = $("#user_password").val();
+            checkLogin(name, pass);
+        }
+    });
+
+    $("#login_button").click(function () {
+        var name = $("#user_email").val();
+        var pass = $("#user_password").val();
+        checkLogin(name, pass);
+    });
+    
+    function checkLogin(username,userpass) {
+        var urlpath = '@Url.Action("CheckLogin", "Account")';
+        $.ajax({
+            url: urlpath,
+            dataType: 'json',
+            type: "Post",
+            data: {
+                UserEmail:username,
+                UserPassword:userpass
+            },
+            async: true,
+            success: function (result) {
+                if (result.isSuccess) {
+                    swal({
+                        title: result.msg,
+                        message: result.msg,
+                                   type: 'error',
+                                    closeOnCancel: true
+                                });
+                } else {
+                    swal({
+                                    title: 'Login Successfully!!',
+                                    type: 'success',
+                                    closeOnCancel: true
+                                },
+                        function () {
+                            window.location.href = result.msg;
+                                });
+                }
+
+            }
+        });
+    }
+    $('#recoverypass').click(function () {
+        if (isEmail($("#user_email").val()) && $("#user_email").val().length>0) {
+            swal({
+                title: 'Are you sure?',
+                text: "This will Send your password to your mail",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes'
+            },function () {
+                RecoveryPassword($("#user_email").val());
+            });
+        } else {
+                            swal({
+                                title: 'Please Enter Email Address First',
+                                type: 'error',
+                                closeOnCancel: true
+                            });
+        }
+    });
+
+       function isEmail(email) {
+        var regex =/^([\w-\.]+@@([\w-]+\.)+[\w-]{2,4})?$/;
+        if(!regex.test(email)) {
+           return false;
+        }else{
+           return true;
+        }
+    }
+    function RecoveryPassword(email) {
+                var urlpath = '@Url.Action("RecoveryPassword", "Account")';
+                $.ajax({
+                    url: urlpath,
+                    dataType: 'json',
+                    type: "Post",
+                    data: {Email:email},
+                    async: true,
+                    success: function (data) {
+                        if (data) {
+                            swal({
+                                title: 'Password Sent to your email',
+                                type: 'success',
+                                closeOnCancel: true
+                            },
+                                function () {
+                                    window.location.href = '@Url.Action("Index", "Account")';
+                                });
+                        } else {
+                            swal({
+                                title: 'There are no account available with this email',
+                                type: 'error',
+                                closeOnCancel: true
+                            });
+                        }
+                    }
+                });
+        }
+</script>

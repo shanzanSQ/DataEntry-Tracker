@@ -1,0 +1,69 @@
+﻿<style type="text/css">
+    .btn,.form-control{
+        border-radius:0px;
+    }
+</style>
+<font size="2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2">
+                <ul class="nav">
+                    <li><a href="#" onclick="">Dashboard</a></li>
+                    <li><a href="#" onclick="AllRequestById()">All Request</a></li>
+                    <li><a href="#" onclick="">Pending To Co ordinator</a></li>
+                    <li><a href="#" onclick="">Data entry Assigned </a></li>
+                    <li><a href="#" onclick="">Complete List</a></li>
+                    <li><a href="#" onclick="">Closed List </a></li>
+                    <li><a href="#" onclick="">Merchandiser List</a></li>
+                    <li><a href="#" onclick="">Co Ordinator List</a></li>
+                    <li><a href="#" onclick="">Data Entry List</a></li>
+                </ul>
+            </div>
+            <div class="col-md-10" >
+                <h3 style="text-align:center">Admin Dashboard</h3>
+                <div id="admin_dashboard">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</font>
+<script type="text/javascript">
+    function AllRequestById() {
+        var urlpath = '@Url.Action("AllMasterRequest", "AdminUser")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {},
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $('#admin_dashboard').empty();
+                            $('#admin_dashboard').html(data);
+                            $("#requestTableList").DataTable();
+                        }
+
+                },
+                error: function () {
+                    swal({
+                        title: 'Something Went Wrong!!',
+                        type: 'error',
+                        closeOnCancel: true
+                    });
+                }
+            });
+    }
+    function AdminGetDetails(RequestId) {
+        var urlpath = '@Url.Action("GetRequestInformationById", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { RequestId: RequestId },
+                    async: true,
+                    success: function(data) {
+                        $('#admin_dashboard').empty();
+                        $('#admin_dashboard').html(data);
+                    }
+                });
+    }
+</script>

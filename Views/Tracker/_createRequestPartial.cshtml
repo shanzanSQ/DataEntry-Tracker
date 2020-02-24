@@ -1,0 +1,225 @@
+﻿
+<div>
+    <div class="row" id="topDivition">
+        <div class="col-md-3">
+            <input class="btn btn-success btn-sm" onclick="addRequest()" value="Add New Request" />
+        </div>
+        <div class="col-md-3">
+
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control form-control-sm" id="requestIdInput" placeholder="Enter request number" />
+        </div>
+        <div class="col-md-3">
+            <input class="btn btn-primary btn-sm" id="revisionRequest" value="Revision Request" />
+        </div>
+    </div>
+    <br />
+    <div id="add_newRequest" style="display:none">
+        <div class="row">
+            <div class="col-md-3">
+                <label for="loadBusiness">Company </label>
+                <select id="loadBusiness" class="form-control form-control-sm" onchange="colorChange('#loadBusiness')">
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="loadbuyer">Buyer</label>
+                <select id="loadbuyer" class="form-control form-control-sm" onchange="colorChange('#loadbuyer')">
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="loadseason">Season</label>
+                <select id="loadseason" class="form-control form-control-sm" onchange="colorChange('#loadseason')">
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="loadstyle">Style</label>
+                <select id="loadstyle" class="form-control form-control-sm">
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="" style="display:none">
+                <label for="cordinator">CO-Ordinator </label>
+                <select class="form-control form-control-sm" id="cordinator">
+                    <option value="1013">Coordinator User</option>
+                    <option value="1016">Coordinator User</option>
+                </select>
+            </div>
+            <div class="col-md-12">
+                <label for="instructions">Instructions</label>
+                <textarea type="text" rows="2" style="resize:none"  class="form-control form-control-sm" id="instructions" />
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-md-12" style="text-align:center">
+                <input type="button" id="add_request" value="Add Request" class="btn btn-success btn-sm" />
+            </div>
+        </div>
+    </div>
+    <div id="genarate_dashboard" class="row">
+
+    </div>
+</div>
+<script type="text/javascript">
+    function addRequest() {
+        $('#add_newRequest').show();
+          LoadUnits();
+          LoadBuyer();
+    }
+    $("#revisionRequest").click(function () {
+        if (!$.isNumeric($("#requestIdInput").val())) {
+            swal({
+                title: 'Please Enter A Valid Request ID',
+                type: 'error',
+                closeOnCancel: true
+            });
+        } else {
+            GetDetailsInformationBYRequestId($("#requestIdInput").val())
+        }
+        
+    });
+
+    $('#loadbuyer').change(function () {
+        var buyerId = $('#loadbuyer').val();
+        $('#loadstyle').empty();
+        LoadSeasons(buyerId);
+    });
+
+    $('#loadseason').change(function () {
+        var seasonId = $('#loadseason').val();
+        LoadStyles(seasonId);
+    });
+
+
+
+
+    function LoadUnits() {
+        var urlpath = '@Url.Action("GetUnitsFromDataBase", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {},
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                           $('#loadBusiness').empty();
+                           $('#loadBusiness').append("<option value='0'>--Select Unit--</option>");
+                            for (var i = 0; i < data.length; i++) {
+                                $("#loadBusiness").append($("<option></option>").val(data[i].UnitId)
+                                    .html(data[i].UnitName));
+                            }
+                        }
+                    }
+                });
+    }
+    
+
+
+    function LoadSeasons(buyerId) {
+        var urlpath = '@Url.Action("GetSeasonFromDatabase", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {buyerId:buyerId},
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $('#loadseason').empty();
+                            $('#loadseason').append("<option value='0'>--Select Season--</option>");
+                            for (var i = 0; i < data.length; i++) {
+                                $("#loadseason").append($("<option></option>").val(data[i].SeasonId)
+                                    .html(data[i].SeasonName));
+                            }
+                        }
+                    }
+                });
+    }
+
+
+    $("#add_request").click(function () {
+        var check = true;
+        if ($("#loadBusiness").val() == "0") {
+            check = false;
+            $('#loadBusiness').css({ "border-color": "#FF0000" });
+        } else if ($("#loadbuyer").val() == "0") {
+            check = false;
+            $('#loadbuyer').css({ "border-color": "#FF0000" });
+        } else if ($("#loadseason").val() == "0") {
+            check = false;
+            $('#loadseason').css({ "border-color": "#FF0000" });
+        } else if ($("#instructions").val().length < 1) {
+            $('#instructions').val("N/A");
+        }
+        else {
+            check = true;
+        }
+        if (check == false) {
+            swal({
+                title: 'Please Fill Up The Section First',
+                type: 'error',
+                closeOnCancel: true
+            });
+        } else {
+            GenarateNewRequest();
+        }
+    });
+
+    function colorChange(elem) {
+        $(elem).css({ "border-color": "#d3d3d3" });
+    }
+
+    function GenarateNewRequest() {
+        var jsonObj = {};
+         jsonObj["UnitId"]=  $("#loadBusiness").val();
+         jsonObj["UnitName"]= $("#loadBusiness").children("option:selected").html();
+         jsonObj["BuyerId"] = $("#loadbuyer").val();
+         jsonObj["BuyerName"] = $("#loadbuyer").children("option:selected").html();
+         jsonObj["SeasonId"] = $("#loadseason").val();
+         jsonObj["SeasonName"]= $("#loadseason").children("option:selected").html();
+         jsonObj["StyleId"] = $("#loadstyle").val();
+         jsonObj["StyleName"] = $("#loadstyle").children("option:selected").html();
+         jsonObj["Instruction"] =  $("#instructions").val();
+         jsonObj["CoordinatorId"] =  $("#cordinator").val();
+
+         var urlpath = '@Url.Action("GenarateNewRequest", "Tracker")';
+                $.ajax({
+                    contentType: "application/json",
+                    data: JSON.stringify(jsonObj),
+                    dataType: 'html',
+                    url: urlpath,
+                    type: "Post",
+                    async: true,
+                    success: function (data) {
+                      if (data) {
+                            $('#add_newRequest').hide();
+                            $('#topDivition').hide();
+                            $("#genarate_dashboard").empty();
+                            $("#genarate_dashboard").append(data);
+                        }
+                    }
+                });
+    }
+
+    function LoadStyles(seasonId) {
+        var urlpath = '@Url.Action("GetStylesFromFromDatabase", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {seasonId:seasonId},
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $('#loadstyle').empty();
+                            $('#loadstyle').append("<option value='0'>Common Style </option>");
+                            for (var i = 0; i < data.length; i++) {
+                                $("#loadstyle").append($("<option></option>").val(data[i].StyleId)
+                                    .html(data[i].StyleName));
+                            }
+                        }
+                    }
+            });
+    }
+</script>
+

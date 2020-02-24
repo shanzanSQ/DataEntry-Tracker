@@ -1,0 +1,588 @@
+﻿
+@{
+    ViewBag.Title = "MerchandiseCreateView";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/Content/LoadingModal.css" rel="stylesheet" />
+<link href="~/Content/coordinatorstyle.css" rel="stylesheet" />
+<style type="text/css">
+    .form-control, .btn {
+        border-radius: 0px;
+    }
+    /* Button used to open the chat form - fixed at the bottom of the page */
+    .open-button {
+        background-color: #555;
+        color: white;
+        border: none;
+        cursor: pointer;
+        opacity: 0.8;
+        position: fixed;
+        bottom: 10px;
+        width: 200px;
+    }
+
+    /* The popup chat - hidden by default */
+    .chat-popup {
+        display: none;
+        position: fixed;
+        bottom: 0px;
+        border: 1px solid #f1f1f1;
+        z-index: 1;
+        height: 300px;
+    }
+
+    /* Add styles to the form container */
+    .form-container {
+        max-width: 220px;
+        padding: 5px;
+        background-color: white;
+    }
+
+    .messagediv {
+        width: 100%;
+        height: 220px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        overflow-wrap: break-word;
+    }
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .messagediv::-webkit-scrollbar {
+            display: none;
+        }
+
+    /* Hide scrollbar for IE and Edge */
+    .messagediv {
+        -ms-overflow-style: none;
+    }
+    /* Add some hover effects to buttons */
+    .form-container .btn:hover, .open-button:hover {
+        opacity: 1;
+    }
+</style>
+
+<font size="2" face="Times New Roman">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2">
+                <ul class="nav">
+                    <li><a href="#" onclick="changeDiv(0)">Create New Request</a></li>
+                    <li><a href="#" onclick="AllRequestById()">All Request </a></li>
+                    <li><a href="#" onclick="changeDiv(1)">Add Information</a></li>
+                </ul>
+            </div>
+            <div class="col-md-10">
+                <h3 style="text-align:center">Merchandiser View</h3>
+                <div id="genarate_dashboard"> </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal" id="modal_preview">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" style="text-align:center">Merchandiser Request Preview</h4>
+                </div>
+                <div id="modalbody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="remove_button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <!-- / Loading modal  -->
+    <div class="modal fade" id="loadMe" tabindex="-1" role="dialog" aria-labelledby="loadMeLabel">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <div class="loader"></div>
+                    <div clas="loader-txt">
+                        <p>
+                            Please Wait Until The Data is Loading....................<br>
+                            <br><small>
+                                Data loading ...........................
+                                <br />
+                                SQ Data Entry Center
+                            </small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modalTaskPreview" >
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Request Number: <input id="RequestCoId" type="text" style="border:none;background:none" disabled /> </h4>
+                </div>
+                <div id="modaltaskbody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+</font>
+
+
+
+@*<div class="chat-popup"  id="myForm">
+        <button type="button" class="form-control btn btn-info btn-sm cancel" id="cancelButton" onclick="closeForm()">Co- Ordinator</button>
+
+        <div class="form-container">
+            <div class="messagediv" id="merchandMessage">
+
+            </div>
+            <table style="margin-top:2px" width="100%">
+                <tr>
+                    <td width="80%">
+                        <input type="text"  id="enterMessage" placeholder="" />
+                    </td>
+                    <td width="20%">
+                        <button type="button"  id="sendTosender"><span class="glyphicon glyphicon-send"></span></button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <button class="open-button btn btn-success btn-sm" id="chatbutton" onclick="openForm()">Chat</button>*@
+
+<div class="online-popup" id="chatform">
+    <button type="button" class="chatbutton cancel" id="cancelChatbutton" onclick="closeForm()">See Users</button>
+
+    <div class="onlinechatcontainer">
+        <ul id="usersUl">
+        </ul>
+    </div>
+</div>
+<button class="open-button btn btn-success btn-sm" id="openchatbutton" onclick="openForm()" style="display:none">Online</button>
+
+<div id="chat-popupuser">
+    <input type="button" class="form-control btn btn-info btn-sm cancel" id="removepopup" onclick="removeChatPopUp()" />
+    <div class="messagediv" id="messageshow"></div>
+    <input type="hidden" id="recevierId" value="" />
+    <table style="margin-top:5px" width="100%">
+        <tr>
+            <td width="80%"><input type="text" id="enterMessage" placeholder="" /></td>
+            <td width="20%"><button class="btn btn-sm btn-info" type="button" id="sendmessageuser"><span class="glyphicon glyphicon-send"></span></button></td>
+        </tr>
+    </table>
+</div>
+
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script type="text/javascript">
+    var t;
+    //$("#sendTosender").click(function () {
+    //    if ($("#enterMessage").val().length<1) {
+    //         $("#enterMessage").attr({ "placeholder": "enter message" });
+    //    } else {
+    //         var message = $("#enterMessage").val();
+    //        saveChatMessage(2, message, "#merchandMessage");
+    //        $("#enterMessage").val("");
+    //    }
+    //});
+    $("#sendmessageuser").click(function () {
+        if ($("#enterMessage").val().length<1) {
+             $("#enterMessage").attr({ "placeholder": "enter message" });
+        } else {
+            var message = $("#enterMessage").val();
+            saveChatMessage(parseInt($("#recevierId").val()), message, "#messageshow");
+            $("#enterMessage").val("");
+        }
+    });
+
+    function submitTracker(requestId) {
+        if ($("#baseOperations").val() == "0") {
+            $('#baseOperations').css({ "border-color": "#FF0000" });
+        } else if ($("#selectrevision").val() == "0") {
+            $('#selectrevision').css({ "border-color": "#FF0000" });
+        } else if (!$.isNumeric($("#noofTransections").val())) {
+            $('#noofTransections').css({ "border-color": "#FF0000" });
+        } else {
+            var instructions = $("#modalInstruction").val();
+            var oprationId = $("#baseOperations").val();
+            if ($('#selectrevision').val() == 1) {
+               oprationId = parseInt($('#baseOperations').val());
+            } else {
+               oprationId= parseInt($('#baseOperations').val()) + 9;
+             }
+             var priority = $("#priority").val();
+             var noOfTransections = $("#noofTransections").val();
+             var urlpath = '@Url.Action("SubmitToTracker", "Tracker")';
+                $.ajax({
+                    url: urlpath,
+                    type: "Post",
+                    data: { RequestId: requestId, Instructions: instructions, OperationId: oprationId, Priority: priority, NoOfTransections: noOfTransections },
+                    async: true,
+                    success: function(data) {
+                            if (data) {
+                                swal({
+                                        title: 'Request Sent To Co ordinatior Successfully!!',
+                                        type: 'success',
+                                        closeOnCancel: true
+                                    },
+                            function () {
+                                    GetDetailsInformationBYRequestId(requestId)
+                                    });
+                            } else {
+                                Swal.fire(
+                                    'Something went Wrong please Submit Again!',
+                                    'You clicked the button!',
+                                    'error'
+                                );
+                            }
+                        }
+                    });
+        }
+    }
+
+    function openForm() {
+        document.getElementById("chatform").style.display = "block";
+         $("#openchatbutton").hide();
+         $("#cancelChatbutton").show();
+        allTrackerUsers(15);
+        t = setInterval(function () { allTrackerUsers(15);}, 1000);
+
+    }
+
+    function allTrackerUsers(module) {
+        var urlpath = '@Url.Action("GetTrackerUser", "Tracker")';
+                $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { Module:module},
+                async: true,
+                success: function (data) {
+                    if (data) {
+                        $("#usersUl").empty();
+                        for (var i = 0; i < data.length; i++) {
+                            if (data[i].UserTypeId == 1) {
+                                $("#usersUl").append('<li><a href="#" onclick="openChatPopUp(' + data[i].UserInformationId + ',\'' + data[i].UserInformationName + '\')"  >' + data[i].UserInformationName + '</a><span style="color:#FF0000">(' + data[i].UserTypeId+')</span></li>');
+                            } else {
+                                $("#usersUl").append('<li><a href="#" onclick="openChatPopUp(' + data[i].UserInformationId + ',\'' + data[i].UserInformationName + '\')"  >' + data[i].UserInformationName + '</a></li>');
+                            }
+
+                        }
+                    }
+                }
+                });
+    }
+    function closeForm() {
+        document.getElementById("chatform").style.display = "none";
+        $("#openchatbutton").show();
+        $("#cancelChatbutton").hide();
+        clearInterval(t);
+    }
+    function openChatPopUp(userId, userName) {
+        clearInterval(t);
+        $("#chat-popupuser").show();
+        $("#removepopup").val(userName);
+        $("#recevierId").val(userId);
+        getChattingMessage(userId, "#messageshow");
+        t = setInterval(function () { getChattingMessage(userId, "#messageshow");}, 1000);
+    }
+    function removeChatPopUp() {
+        $("#chat-popupuser").hide();
+        clearInterval(t);
+    }
+    function saveChatMessage(sendto, message, messagediv) {
+        var urlpath = '@Url.Action("SaveChatMessageToDatabase", "Tracker")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: { SendTo: sendto, Message: message },
+            async: true,
+            success: function (data) {
+                if (data) {
+                    getChattingMessage(sendto, messagediv);
+                }
+            }
+        });
+    }
+    function getChattingMessage(sendto, messageDiv) {
+        allTrackerUsers(15);
+        var urlpath = '@Url.Action("GetAllChattingMessage", "Tracker")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: { SendTo: sendto },
+            async: true,
+            success: function (data) {
+                if (data) {
+                    $(messageDiv).empty();
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i].UserId != sendto) {
+                            var messages = '<p style="margin:1px;text-align:right;color:blue;padiing-right:1px" >' + data[i].Message + '</p>';
+                        } else {
+                            var messages = '<p style="margin:1px;text-align:left;padiing-left:1px">' + data[i].Message + '</p>';
+                        }
+                        $(messageDiv).append(messages);
+                    }
+                    $(messageDiv).scrollTop(99999);
+                }
+            }
+        });
+    }
+
+
+
+    //function openForm() {
+    //    document.getElementById("myForm").style.display = "block";
+    //    $("#chatbutton").hide();
+    //    $("#cancelButton").show();
+    //    getChattingMessage(2, "#merchandMessage");
+    //    t = setInterval(function () { getChattingMessage(2, "#merchandMessage");}, 1000);
+    //}
+
+    //function closeForm() {
+    //    document.getElementById("myForm").style.display = "none";
+    //    $("#chatbutton").show();
+    //    $("#cancelButton").hide();
+    //     clearInterval(t);
+    //}
+     function changeDiv(status) {
+        var urlpath = '@Url.Action("ChangeDivView", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {status:status},
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $('#genarate_dashboard').empty();
+                            $('#genarate_dashboard').html(data);
+                        }
+                    }
+            });
+    }
+
+    function AllRequestById() {
+         $("#loadMe").modal({
+              backdrop: "static", //remove ability to close modal with click
+              keyboard: false, //remove option to close with keyboard
+              show: true //Display loader!
+            });
+        var urlpath = '@Url.Action("AllRequestById", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {},
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $("#loadMe").modal("hide");
+                            $('#genarate_dashboard').empty();
+                            $('#genarate_dashboard').html(data);
+                            $("#requestTableList").DataTable();
+                        }
+
+                },
+                error: function () {
+                    $("#loadMe").modal("hide");
+                    swal({
+                        title: 'Something Went Wrong!!',
+                        type: 'error',
+                        closeOnCancel: true
+                    });
+                }
+            });
+    }
+
+    function showAllUploadedFiles(requestId,status) {
+         var urlpath = '@Url.Action("GetFilesFromDatabase", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { RequestId: requestId,Status:status },
+                    async: true,
+                    success: function(data) {
+                        $("#modalbody").html("");
+                        $("#modalbody").append(data);
+                        $("#modal_preview").modal("show");
+                    }
+                });
+    }
+    function saveChatMessage(sendto, message, messagediv) {
+    var urlpath = '@Url.Action("SaveChatMessageToDatabase", "Tracker")';
+    $.ajax({
+        url: urlpath,
+        type: "Post",
+        data: { SendTo: sendto, Message: message },
+        async: true,
+        success: function (data) {
+            if (data) {
+                getChattingMessage(sendto, messagediv);
+            }
+        }
+    });
+}
+    function getChattingMessage(sendto,messageDiv) {
+    var urlpath = '@Url.Action("GetAllChattingMessage", "Tracker")';
+    $.ajax({
+        url: urlpath,
+        type: "Post",
+        data: { SendTo: sendto },
+        async: true,
+        success: function (data) {
+            if (data) {
+                $(messageDiv).empty();
+                for (var i = 0; i < data.length; i++) {
+                    if (data[i].UserId != sendto) {
+                        var messages = '<p style="margin:1px;text-align:right;color:blue;padiing-right:1px" >' + data[i].Message + '</p>';
+                    } else {
+                        var messages = '<p style="margin:1px;text-align:left;padiing-left:1px">' + data[i].Message + '</p>';
+                    }
+                    $(messageDiv).append(messages);
+                }
+                $(messageDiv).scrollTop(99999);
+            }
+        }
+    });
+    }
+
+    function LoadBuyer() {
+        var urlpath = '@Url.Action("GetBuyerFromDataBase", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {},
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                           $('#loadbuyer').empty();
+                           $('#loadbuyer').append("<option value='0'>--Select Buyer--</option>");
+                            for (var i = 0; i < data.length; i++) {
+                                $("#loadbuyer").append($("<option></option>").val(data[i].BuyerId)
+                                    .html(data[i].BuyerName));
+                            }
+                        }
+                    }
+                });
+    }
+
+
+        
+
+    function uploadFiles(upfile,operation,request,instruction,rivision,showtable) {
+        var fileData = new FormData();
+        var fileUpload = $(upfile).prop('files');
+            if (fileUpload.length>0) {
+                 for (var i = 0; i < fileUpload.length; i++) {
+                     fileData.append(fileUpload[i].name, fileUpload[i]);
+                 }
+        }
+        fileData.append('formdataId', operation);
+        fileData.append('requestId', request);
+        fileData.append('instructions', instruction);
+        fileData.append('rivisiono', rivision);
+
+        var urlpath = '@Url.Action("UploadFiles", "Tracker")';
+        $.ajax({
+            url: urlpath,//URL to upload files
+            type: "post", //as we will be posting files and other method POST is used
+            processData: false, //remember to set processData and ContentType to false, otherwise you may get an error
+            contentType: false,
+            data: fileData  ,
+            success: function (result) {
+                        //$("#loadMe").modal("hide");
+                        swal({
+                                title: 'File Uploaded Successfully',
+                                type: 'success',
+                                closeOnCancel: true
+                        }, function () {
+                                for (var i = 0; i < result.length; i++) {
+                                    var newRow = $('<tr id="'+result[i].FileUploadId+'">');
+                                    var cols = "";
+                                    cols += '<td>' + result[i].OperationName + '</td>';
+                                    cols += '<td>' + result[i].FileUploadName + '</td>';
+                                    cols += '<td>'+result[i].Instructions+'</td>';
+                                    cols += '<td><input type="button" style="margin:2px" class="btn btn-danger btn-sm" onclick="DeleteFile('+result[i].FileUploadId+')"   value="X"></td></tr>';
+                                    newRow.append(cols);
+                                    $(showtable).append(newRow);
+                                }
+                                $(upfile).val('');
+                                $(instruction).val('');
+                        });
+                    },
+                    error: function (err) {
+                        alert(err.responseText);
+                    }
+                });
+    }
+    function GetDetailsInformationBYRequestId(RequestId) {
+        var urlpath = '@Url.Action("GetRequestInformationById", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { RequestId: RequestId },
+                    async: true,
+                    success: function(data) {
+                        $('#genarate_dashboard').empty();
+                        $('#genarate_dashboard').html(data);
+                        
+                    }
+                });
+    }
+
+    function InsertComments(requestId) {
+        if ($("#commentsText").val().length < 1) {
+
+        } else {
+            var comments = $("#commentsText").val();
+            var urlpath = '@Url.Action("InsertComments", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { RequestId: requestId, Comments: comments },
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $("#commentsText").val("");
+                            CommentsTable(requestId);
+                        }
+                    }
+                });
+        }
+        
+    }
+    function CommentsTable(requestId) {
+            var urlpath = '@Url.Action("ReadAllComments", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { RequestId: requestId },
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $("#commentsSection").empty();
+                            for (var i = 0; i < data.length; i++) {
+                                        var newRow = $('<tr>');
+                                        var cols = "";
+                                        cols += '<td style="width:20%;color:blue">' + data[i].UserName + '</td>';
+                                        cols += '<td style="width:30%;">' + data[i].CreateTime + '</td>';
+                                        cols += '<td style="width:50%;word-break: break-word">' + data[i].ReviewMessage + '</td></tr>';
+                                newRow.append(cols);
+                                $("#commentsSection").append(newRow);
+                            }
+                            
+                        }
+                    }
+                });    
+    }
+
+</script>
+
+

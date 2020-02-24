@@ -1,0 +1,521 @@
+﻿@model DataEntry_Tracker.Models.CommonModel
+    <style>
+        .tableshow{
+            width:100%;
+        }
+    </style>
+    <div>
+        <table class="table table-bordered table-responsive">
+            <tr>
+                <th>Request Id</th>
+                <th>Unit Name </th>
+                <th>Buyer Name</th>
+                <th>Session Name </th>
+                <th>Style Name</th>
+                <th>Rivision No</th>
+                <th>Instructions</th>
+            </tr>
+            <tr>
+                <td id="requestId">@Model.RequestId</td>
+                <td>@Model.UnitName</td>
+                <td>@Model.BuyerName</td>
+                <td>@Model.SeasonName</td>
+                <td>@Model.StyleName</td>
+                <td id="rivisionNo">@Model.RivisionNo</td>
+                <td style="overflow-wrap:break-word">@Model.Instruction</td>
+            </tr>
+        </table>
+        <div class="row">
+            @if (Model.fileUploadModelsList != null)
+            {
+                <div style="overflow:auto;max-height:200px" class="col-md-6">
+                    <table class="table">
+                        <tr>
+                            <th>
+                                Operation Name
+                            </th>
+                            <th>
+                                Rivision No
+                            </th>
+                            <th>
+                                File Name
+                            </th>
+                            <th>
+                                Download
+                            </th>
+                        </tr>
+                        @{ int count = 1;}
+                        @foreach (var item in Model.fileUploadModelsList)
+                        {
+                            <tr>
+                                <td>
+                                    @item.OperationName
+                                </td>
+                                <td>
+                                    @item.RevisionNo
+                                </td>
+                                <td>
+                                    @item.FileUploadName
+                                </td>
+                                <td>
+                                    @Html.ActionLink("Download", "DownloadFile", "Tracker", new { filepath = item.FileUploadPath.ToString(), filename = item.FileUploadName.ToString() }, new { @target = "_blank" })
+                                </td>
+                            </tr>
+                            count++;
+                        }
+
+                    </table>
+                </div>
+            }
+            @if (Model.RevisionList != null)
+            {
+                <div style="overflow-x:auto;max-height:200px;" class="col-md-6">
+                    <table class="table">
+                        <tr>
+                            <th>
+                                Operation Name
+                            </th>
+                            <th>
+                                Create Time
+                            </th>
+                            <th>
+                                Instruction
+                            </th>
+                            <th>
+                                Progress
+                            </th>
+                        </tr>
+                        @{ int count = 1;}
+                        @foreach (var item in Model.RevisionList)
+                        {
+                            <tr>
+                                <td>
+                                    @item.BaseOperationName
+                                </td>
+                                <td>
+                                    @item.CreateDate
+                                </td>
+                                <td style="width:20%;overflow-wrap:break-word">
+                                    @item.Instruction
+                                </td>
+                                <td style="color:green">
+                                    @item.AssignTo
+                                </td>
+                            </tr>
+                            count++;
+                        }
+
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+       
+    <div class="row">
+        <h4 style="text-align:center">Operations</h4>
+        <div style="align-content:center" >
+            
+        </div>
+        <div>
+            <div>
+                <input type="checkbox" id="stylecreation" name="stylecreation" onchange="DataToggle('#stylecreationdiv')" value="0" /><strong>Style Creation (Tech Pack)</strong>
+                <select style="width:30%" id="styleCreationSelect">
+                    <option value="1">Creation</option>
+                    <option value="10">Revision</option>
+                </select>
+                <div style="display:none" id="stylecreationdiv">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table id="stylecreationtable" style="text-align:center" class="table table-striped">
+                                <tr>
+                                    <td>
+                                        <input type="file" id="file_uploaded" name="file_uploaded" />
+                                    </td>
+                                    <td>
+                                        <input type="text" id="textFileinstructions" name="file_uploaded" />
+                                    </td>
+                                    <td>
+                                        <input type="button" onclick="uploadFiles('#stylecreationtable tr', '#stylecreationShow', '#textFileinstructions', $('#styleCreationSelect').val())" value="Add Files" class="btn btn-success btn-sm" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table id="stylecreationShow" class="tableshow">
+                                <tr>
+                                    <th width="90%">File Name </th>
+                                    <th width="10%">Action</th>
+                                </tr>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+               <input type="checkbox" id="salescontract" name="stylecreation" onchange="DataToggle('#salescontractdiv')" value="0" /><strong>Sales Contract</strong>
+               <select style="width:30%" id="salescontractoption">
+                    <option value="2">Creation</option>
+                    <option value="11">Revision</option>
+                </select>
+                <div style="display:none" id="salescontractdiv">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table id="salescontractTable" style="text-align:center" class="table table-striped">
+                                <tr>
+                                    <td>
+                                        <input type="file" id="file_uploaded" name="file_uploaded" />
+                                    </td>
+                                    <td>
+                                        <input type="text" id="salescontactInstruction" name="file_uploaded" />
+                                    </td>
+                                    <td>
+                                        <input type="button" onclick="uploadFiles('#salescontractTable tr', '#salescontactshow', '#salescontactInstruction', $('#salescontractoption').val())" value="Add Files " class="btn btn-success btn-sm" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table id="salescontactshow" class="tableshow">
+                                <tr>
+                                    <th width="90%">File Name </th>
+                                    <th width="10%">Action</th>
+                                </tr>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+
+                <input type="checkbox" id="costing" name="stylecreation" onchange="DataToggle('#costingdiv')" value="0" /><strong>Costing</strong>
+                <select style="width:30%" id="costing_option">
+                    <option value="3">Creation</option>
+                    <option value="12">Revision</option>
+                </select>
+                <div style="display:none" id="costingdiv">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table id="costingTable" style="text-align:center" class="table table-striped">
+                                <tr>
+                                    <td>
+                                        <input type="file" id="file_uploaded" name="file_uploaded" />
+                                    </td>
+                                    <td>
+                                        <input type="text" id="costingInstruction" name="file_uploaded" />
+                                    </td>
+                                    <td>
+                                        <input type="button" onclick="uploadFiles('#costingTable tr', '#costingshow', '#costingInstruction', $('#costing_option').val())" value="Add Files " class="btn btn-success btn-sm" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table id="costingshow" class="tableshow">
+                                <tr>
+                                    <th width="90%">File Name </th>
+                                    <th width="10%">Action</th>
+                                </tr>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <input type="checkbox" id="oc" name="oc" onchange="DataToggle('#ocdiv')" value="0" /><strong>OC</strong>
+                <select style="width:30%" id="ocselect">
+                    <option value="4">Creation</option>
+                    <option value="13">Revision</option>
+                </select>
+                <div style="display:none" id="ocdiv">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table id="octable" style="text-align:center" class="table table-striped">
+                                <tr>
+                                    <td>
+                                        <input type="file" id="file_uploaded" name="file_uploaded" />
+                                    </td>
+                                    <td>
+                                        <input type="text" id="ocinstructions" name="file_uploaded" />
+                                    </td>
+                                    <td>
+                                        <input type="button" onclick="uploadFiles('#octable tr', '#ocshow', '#ocinstructions', $('#ocselect').val())" value="Add Files " class="btn btn-success btn-sm" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table id="ocshow" class="tableshow">
+                                <tr>
+                                    <th width="90%">File Name </th>
+                                    <th width="10%">Action</th>
+                                </tr>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <input type="checkbox" id="bom" name="bom" onchange="DataToggle('#bomdiv')" value="0" /><strong>BOM</strong>
+                <select style="width:30%" id="bomselect">
+                    <option value="5">Creation</option>
+                    <option value="14">Revision</option>
+                </select>
+                <div style="display:none" id="bomdiv">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table id="bomtable" style="text-align:center" class="table table-striped">
+                                <tr>
+                                    <td>
+                                        <input type="file" id="file_uploaded" name="file_uploaded" />
+                                    </td>
+                                    <td>
+                                        <input type="text" id="bominstructions" name="file_uploaded" />
+                                    </td>
+                                    <td>
+                                        <input type="button" onclick="uploadFiles('#bomtable tr', '#bomshow', '#bominstructions', $('#bomselect').val())" value="Add Files " class="btn btn-success btn-sm" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table id="bomshow" class="tableshow">
+                                <tr>
+                                    <th width="90%">File Name </th>
+                                    <th width="10%">Action</th>
+                                </tr>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <input type="checkbox" id="adocIndent" name="oc" onchange="DataToggle('#adocIndentdiv')" value="0" /><strong>Adoc Indent</strong>
+                <select style="width:30%" id="adocindentselect">
+                    <option value="6">Creation</option>
+                    <option value="15">Revision</option>
+                </select>
+                <div style="display:none" id="adocIndentdiv">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table id="adocindenttable" style="text-align:center" class="table table-striped">
+                                <tr>
+                                    <td>
+                                        <input type="file" id="file_uploaded" name="file_uploaded" />
+                                    </td>
+                                    <td>
+                                        <input type="text" id="adocinstructions" name="file_uploaded" />
+                                    </td>
+                                    <td>
+                                        <input type="button" onclick="uploadFiles('#adocindenttable tr', '#adocshow', '#adocinstructions', $('#adocindentselect').val())" value="Add Files " class="btn btn-success btn-sm" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table id="adocshow" class="tableshow">
+                                <tr>
+                                    <th width="90%">File Name </th>
+                                    <th width="10%">Action</th>
+                                </tr>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <input type="checkbox" id="rmpo" name="oc" onchange="DataToggle('#rmpodiv')" value="0" /><strong>RMPO</strong>
+                <select style="width:30%" id="rmposelect">
+                    <option value="7">Creation</option>
+                    <option value="16">Revision</option>
+                </select>
+                <div style="display:none" id="rmpodiv">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table id="rmpoTable" style="text-align:center" class="table table-striped">
+                                <tr>
+                                    <td>
+                                        <input type="file" id="file_uploaded" name="file_uploaded" />
+                                    </td>
+                                    <td>
+                                        <input type="text" id="rmpoinstructions" name="file_uploaded" />
+                                    </td>
+                                    <td>
+                                        <input type="button" onclick="uploadFiles('#rmpoTable tr', '#rmposhow', '#rmpoinstructions', $('#rmposelect').val())" value="Add Files " class="btn btn-success btn-sm" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table id="rmposhow" class="tableshow">
+                                <tr>
+                                    <th width="90%">File Name </th>
+                                    <th width="10%">Action</th>
+                                </tr>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <input type="checkbox" id="supplierPi" name="oc" onchange="DataToggle('#supplierPidiv')" value="0" /><strong>Supplier PI</strong>
+                <select style="width:30%" id="supplierPiselect">
+                    <option value="8">Creation</option>
+                    <option value="17">Revision</option>
+                </select>
+                <div style="display:none" id="supplierPidiv">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table id="supplierPiTable" style="text-align:center" class="table table-striped">
+                                <tr>
+                                    <td>
+                                        <input type="file" id="file_uploaded" name="file_uploaded" />
+
+                                    </td>
+                                    <td>
+                                        <input type="text" id="supplierPiinstructions" name="file_uploaded" />
+                                    </td>
+                                    <td>
+                                        <input type="button" onclick="uploadFiles('#supplierPiTable tr', '#supplierPishow', '#supplierPiinstructionsinstructions', $('#supplierPiselect').val())" value="Add Files " class="btn btn-success btn-sm" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table id="supplierPishow" class="tableshow">
+                                <tr>
+                                    <th width="90%">File Name </th>
+                                    <th width="10%">Action</th>
+                                </tr>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <input type="checkbox" id="apr" name="oc" onchange="DataToggle('#aprdiv')" value="0" /><strong>APR</strong>
+                <select style="width:30%" id="aprselect">
+                    <option value="9">Creation</option>
+                    <option value="18">Revision</option>
+                </select>
+                <div style="display:none" id="aprdiv">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table id="aprTable" style="text-align:center" class="table table-striped">
+                                <tr>
+                                    <td>
+                                        <input type="file" id="file_uploaded" name="file_uploaded" />
+                                    </td>
+                                    <td>
+                                        <input type="text" id="aprinstructions" name="file_uploaded" />
+                                    </td>
+                                    <td>
+                                        <input type="button" onclick="uploadFiles('#aprTable tr', '#aprshow', '#aprinstructions', $('#aprselect').val())" value="Add Files " class="btn btn-success btn-sm" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table id="aprshow" class="tableshow">
+                                <tr>
+                                    <th width="90%">File Name </th>
+                                    <th width="10%">Action</th>
+                                </tr>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top:20px;margin-bottom:20px;text-align:center" class="row">
+            <button class="btn btn-danger" id="cancel_button">Cancel</button>
+            <button id="next_button" class="btn btn-info">Next</button>
+        </div>
+    </div>
+
+
+<script type="text/javascript">
+
+    function DeleteFile(fileuploadId) {
+         var urlpath = '@Url.Action("DeleteFiles", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {FileuploadId:fileuploadId},
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $("tr#" + fileuploadId + "").remove();
+                        }
+                    }
+                });
+    }
+
+    function DataToggle(divition) {
+         $(divition).toggle();
+    }
+
+     function uploadFiles(tablename,showtableName,instructioname,opNumber) {
+        var fileData = new FormData();
+        $(tablename).each(function () {
+            var fileUpload = $(this).find('input[name="file_uploaded"]').prop('files');
+            if (fileUpload.length>0) {
+                 for (var i = 0; i < fileUpload.length; i++) {
+                     fileData.append(fileUpload[i].name, fileUpload[i]);
+                 }
+            }
+        });
+         fileData.append('formdataId', opNumber);
+         fileData.append('requestId', $("#requestId").html());
+        fileData.append('instructions', $(instructioname).val());
+        fileData.append('rivisiono', $("#rivisionNo").html());
+
+        var urlpath = '@Url.Action("UploadFiles", "Tracker")';
+        $.ajax({
+            url: urlpath,//URL to upload files
+            type: "post", //as we will be posting files and other method POST is used
+            processData: false, //remember to set processData and ContentType to false, otherwise you may get an error
+            contentType: false,
+            data: fileData  ,
+            success: function (result) {
+                        //$("#loadMe").modal("hide");
+                        swal({
+                                title: 'File Uploaded Successfully',
+                                type: 'success',
+                                closeOnCancel: true
+                        }, function () {
+                                for (var i = 0; i < result.length; i++) {
+                                    var newRow = $('<tr id="'+result[i].FileUploadId+'">');
+                                    var cols = "";
+                                    cols += '<td>' + result[i].FileUploadName + '</td>';
+                                    cols += '<td><input type="button" style="margin:2px" class="btn btn-danger btn-sm" onclick="DeleteFile('+result[i].FileUploadId+')"   value="X"></td></tr>';
+                                    newRow.append(cols);
+                                    $(showtableName).append(newRow);
+                                }
+                                $('#file_uploaded').val('');
+                                $(instructioname).val('');
+                        });
+                    },
+                    error: function (err) {
+                        alert(err.responseText);
+                    }
+                });
+    }
+
+    $("#next_button").click(function () {
+        showAllUploadedFiles($("#requestId").html().trim(),1);
+    });
+    $("#idSubmit").click(function () {
+        submitTracker($("#requestId").html().trim());
+    });
+</script>

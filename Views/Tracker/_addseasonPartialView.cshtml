@@ -1,0 +1,179 @@
+﻿<div style="text-align:center" class="row">
+    <div class="col-md-8">
+        <h4>Create New Season </h4>
+        <div class="col-md-4">
+            <label for="loadbuyer">Select Buyer</label>
+            <select id="loadbuyer" class="form-control"></select>
+        </div>
+        <div class="col-md-4">
+            <label for="addseason">Add New Season </label>
+            <input type="text" id="addseason" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <label for="addseasonbutton">Action</label>
+            <input type="button" id="addseasonbutton" class="btn btn-success btn-sm form-control" value="Add Season" />
+        </div>
+    </div>
+    <div class="col-md-4">
+        <h4>Seasons</h4>
+        <table id="seasonsFromBuyer" border="1" width="100%">
+        </table>
+    </div>
+</div>
+<div style="text-align:center" class="row">
+    <div class="col-md-8">
+        <h4>Create New Style </h4>
+        <div class="col-md-4">
+            <label for="loadseasonforstyle">Select Season</label>
+            <select id="loadseasonforstyle" class="form-control"></select>
+        </div>
+        <div class="col-md-4">
+            <label for="addstyle">Add New Style </label>
+            <input type="text" id="addstyle" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <label for="addstyleButton">Action</label>
+            <input type="button" id="addstyleButton" class="btn btn-success btn-sm form-control" value="Add Style" />
+        </div>
+    </div>
+    <div class="col-md-4">
+        <h4>Styles</h4>
+        <table id="stylefroseason" border="1" width="100%">
+        </table>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    LoadBuyer();
+    $("#loadbuyer").change(function () {
+        LoadAllSeasonByBuyer($("#loadbuyer").val());
+    });
+    $("#loadseasonforstyle").change(function () {
+        LoadMyStyles($("#loadseasonforstyle").val());
+    });
+
+    $("#addseasonbutton").click(function () {
+        if ($("#loadbuyer").val() == "0") {
+            swal({
+                title: 'Select The Buyer First',
+                type: 'error',
+                closeOnCancel: true
+            });
+        } else if ($("#addseason").val().length < 1) {
+            swal({
+                title: 'Please Add The Season Name First',
+                type: 'error',
+                closeOnCancel: true
+            });
+        } else {
+            var seasonName = $("#addseason").val();
+            var buyerID = $("#loadbuyer").val();
+            var urlpath = '@Url.Action("AddNewSeasonByBuyer", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { BuyerId: buyerID, SeasonName: seasonName },
+                async: true,
+                success: function (data) {
+                        if (data) {
+                            swal({
+                                title: 'New Season Added Successfully',
+                                type: 'success',
+                                closeOnCancel: true
+                            }, function () {
+                                LoadAllSeasonByBuyer(buyerID);
+                            });
+                        }
+                    }
+            });
+        }
+    });
+    $("#addstyleButton").click(function () {
+        if ($("#loadseasonforstyle").val() == "0") {
+            swal({
+                title: 'Select The Season First',
+                type: 'error',
+                closeOnCancel: true
+            });
+        } else if ($("#addstyle").val().length < 1) {
+            swal({
+                title: 'Please Add The Style Name First',
+                type: 'error',
+                closeOnCancel: true
+            });
+        } else {
+            var styleName = $("#addstyle").val();
+            var seasonId = $("#loadseasonforstyle").val();
+            var urlpath = '@Url.Action("AddNewStyleBySeason", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { SeasonId: seasonId, StyleName: styleName },
+                async: true,
+                success: function (data) {
+                        if (data) {
+                            swal({
+                                title: 'New Style Added Successfully',
+                                type: 'success',
+                                closeOnCancel: true
+                            }, function () {
+                                    LoadMyStyles(seasonId);
+                            });
+                        }
+                    }
+            });
+        }
+    });
+
+    function LoadAllSeasonByBuyer(buyerId) {
+         var urlpath = '@Url.Action("GetSeasonFromDatabase", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {buyerId:buyerId},
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+
+                             $('#seasonsFromBuyer').empty();
+                            $('#loadseasonforstyle').empty();
+                            $("#loadseasonforstyle").append($("<option value='0'> --Select Style-- </option>"));
+                                 for (var i = 0; i < data.length; i++) {
+                                    var newRow = $('<tr id="' + data[i].SeasonId + '">');
+                                    var cols = "";
+                                        cols += '<td>' + data[i].SeasonName + '</td></tr>';
+                                        newRow.append(cols);
+                                     $("#seasonsFromBuyer").append(newRow);
+                                         $("#loadseasonforstyle").append($("<option></option>").val(data[i].SeasonId)
+                                            .html(data[i].SeasonName));
+                                 }                                 
+                        }
+                    }
+                });
+    }
+
+    function LoadMyStyles(seasonId) {
+        
+        var urlpath = '@Url.Action("GetStylesFromFromDatabase", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {seasonId:seasonId},
+                    async: true,
+                success: function (data) {
+                        if (data) {
+                            $('#stylefroseason').empty();
+                            for (var i = 0; i < data.length; i++) {
+                                    var newRow = $('<tr id="' + data[i].StyleId + '">');
+                                    var cols = "";
+                                        cols += '<td>' + data[i].StyleName + '</td></tr>';
+                                newRow.append(cols);
+                                $("#stylefroseason").append(newRow);
+                            }
+                        }
+                    }
+            });
+    }
+</script>
+

@@ -1,0 +1,140 @@
+﻿@model DataEntry_Tracker.Models.CommonModel
+
+<table class="" width="100%" border="1">
+    <tbody>
+        <tr>
+            <th>Operation Name</th>
+            <td>@Model.BaseOperationName</td>
+        </tr>
+        <tr>
+            <th>Instruction</th>
+            <td>@Model.Instruction</td>
+        </tr>
+        <tr>
+            <th>Create Time</th>
+            <td>@Model.CreateDate.ToString("dd MMM yyyy h:mm:ss tt")</td>
+        </tr>
+        <tr>
+            <th>Assign To</th>
+            <td>@Model.UserName</td>
+        </tr>
+        <tr>
+            <th>Assign Time</th>
+            <td>
+                @if (Model.CoUpdatedBy != "")
+                {@DateTime.Parse(Model.CoUpdatedBy).ToString("dd MMM yyyy h:mm:ss tt")}
+            </td>
+        </tr>
+        <tr>
+            <th>Entry Started</th>
+            <td>
+                @if (Model.DataEntryCreated != "")
+                {@DateTime.Parse(Model.DataEntryCreated).ToString("dd MMM yyyy h:mm:ss tt")}
+            </td>
+        </tr>
+        <tr>
+            <th>Entry End</th>
+            <td>
+                @if (Model.DataEntryUpdated != "")
+                {@DateTime.Parse(Model.DataEntryUpdated).ToString("dd MMM yyyy h:mm:ss tt")}
+            </td>
+        </tr>
+        <tr>
+            <th>Progress</th>
+            @if (Model.Progress == 1)
+            {
+                <td style="color:red">Pending</td>
+            }
+            else
+            {
+                <td style="color:green">Processing</td>
+            }
+        </tr>
+    </tbody>
+</table>
+
+
+@if (Model.fileUploadModelsList != null)
+{
+    <table border="1" width="100%" style="text-align:center">
+        <caption>Files & Instructions</caption>
+        <tr>
+            <th>
+                No
+            </th>
+            <th>
+                File Name
+            </th>
+            <th>
+                Instructions
+            </th>
+            <th>
+                Action
+            </th>
+        </tr>
+        @{ int count = 1;}
+        @foreach (var item in Model.fileUploadModelsList)
+        {
+            <tr>
+                <td>
+                    @count
+                </td>
+                <td>
+                    @item.FileUploadName
+                </td>
+                <td>
+                    @item.Instructions
+                </td>
+                <td>
+                    @Html.ActionLink("Download", "DownloadFile", "Tracker", new { filepath = item.FileUploadPath.ToString(), filename = item.FileUploadName.ToString() }, new { @target = "_blank" })
+                </td>
+            </tr>
+            count++;
+        }
+
+    </table>
+}
+<p>Comments Section</p>
+<div id="comments_section" class="container" style="overflow-wrap:inherit; width:100%;overflow-y: scroll;height:100px;border:1px solid;margin-top:5px">
+    <table width="100%" id="coordinatorComments">
+    </table>
+
+</div>
+<table style="text-align:center;width:80%;margin-left:10%;margin-top:2px">
+    <tr>
+        <td style="width:80%"><input type="text" style="width:100%" id="commentsText" /></td>
+        <td style="width:20%"> <input type="button" style="padding:2px" value="Comments" class="btn btn-sm btn-success" onclick="InsertComments(@Model.RequestCodId)" /></td>
+    </tr>
+</table>
+
+
+@if (Model.Progress == 1)
+{
+    <br />
+    <table width="100%">
+        <tr style="text-align:center">
+            <td><label for="assignTo">Assign To:  </label></td>
+            <td>
+                <select id="assignTo" class="form-control" style="border-radius:0px;"></select>
+            </td>
+            <td>
+                <button type="button" class="btn btn-info btn-sm" id="assignTodataentry">Assign </button>
+            </td>
+            <td>
+                <button type="button" class="btn btn-danger btn-sm" id="rejectRequest" onclick="UpdateStartOrEnd(@Model.RequestCodId,7)">Return </button>
+            </td>
+            <td>
+                <button type="button" class="btn btn-success btn-sm" id="assignTodataentry" onclick="AssignRequestToDataEntry(@Model.RequestCodId,0)">Assign Own </button>
+            </td>
+        </tr>
+    </table>
+}
+<br />
+
+<script type="text/javascript">
+    $("#assignTodataentry").click(function () {
+        var assignname = $("#assignTo").val();
+        var requestId = parseInt($("#RequestCoId").val());
+        AssignRequestToDataEntry(requestId, assignname);
+    });
+</script>

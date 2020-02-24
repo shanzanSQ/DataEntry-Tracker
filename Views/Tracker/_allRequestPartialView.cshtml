@@ -1,0 +1,41 @@
+﻿@model IEnumerable<DataEntry_Tracker.Models.CommonModel>
+
+    <div class="box">
+            <table class="table table-striped" id="requestTableList">
+                <thead>
+                    <tr>
+                        <th>RS</th>
+                        <th>Request Id</th>
+                        <th>Unit Name</th>
+                        <th>Buyer Name</th>
+                        <th>Session Name</th>
+                        <th>Style Name </th>
+                        <th>Revision No</th>
+                        <th>Create Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{ int count = 1;}
+                    @foreach (var item in Model)
+                    {
+                        <tr id="@item.RequestId">
+                            <td>@count</td>
+                            <td>@item.RequestId</td>
+                            <td>@item.UnitName</td>
+                            <td>@item.BuyerName</td>
+                            <td>@item.SeasonName</td>
+                            <td>@item.StyleName</td>
+                            <td>@item.RivisionNo</td>
+                            <td>@item.CreateDate.ToString("dd MMM yyyy h:mm tt")</td>
+                            <td> <button type="button" class="btn  btn-block btn-success btn-sm" onclick="GetDetailsInformationBYRequestId(@item.RequestId)">Preview</button></td>
+                        </tr>
+                        count++;
+                    }
+                </tbody>
+            </table>
+    </div>
+
+<script type="text/javascript">
+   
+</script>
