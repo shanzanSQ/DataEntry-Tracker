@@ -119,18 +119,18 @@ namespace DataEntry_Tracker.Models.DAL
                     {
                         MailMessage message = new MailMessage();
                         SmtpClient smtp = new SmtpClient();
-                        message.From = new MailAddress("noreply.mail1@sqgc.com");
+                        message.From = new MailAddress("noreply.dst@sqgc.com");
                         message.To.Add(new MailAddress(email));
                         message.Subject = "Password Recovery";
                         message.IsBodyHtml = true; //to make message body as html  
                         message.Body = "Dear Mr." + name + "<br/> You requested for Recover your password <br/> Your Password for the Approval management system is : " + PasswordManager.Decrypt(password) + " <br/>" +
                             "Thank you For Being with Us <br/>" +
-                            "<br/>Thank You<br/> <a href='http://10.12.13.163:8080/'>Data Entry Service Tracker</a><br/><br/>sqgc.com";
+                            "<br/>Thank You<br/> <a href='http://10.12.13.163:8013/'>Data Entry Service Tracker</a><br/><br/>sqgc.com";
                         smtp.Port = 587;
                         smtp.Host = "smtp.office365.com"; //for gmail host  
                         smtp.EnableSsl = true;
                         smtp.UseDefaultCredentials = false;
-                        smtp.Credentials = new NetworkCredential("noreply.mail1@sqgc.com", "Clothing@45678");
+                        smtp.Credentials = new NetworkCredential("noreply.dst@sqgc.com", "data@235");
                         smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
                         smtp.Send(message);
                         success = true;

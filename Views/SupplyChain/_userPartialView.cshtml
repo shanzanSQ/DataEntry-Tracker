@@ -1,0 +1,38 @@
+﻿@model IEnumerable<DataEntry_Tracker.Models.RequestSupplyChain>
+<div class="box">
+    <table class="table table-striped" id="coordinatorTable">
+        <thead>
+            <tr>
+                <th>S.Chain ID</th>
+                <th>Buyer Name</th>
+                <th>Style Name</th>
+                <th>Po Number</th>
+                <th>OTT Date</th>
+                <th>Requested By</th>
+                <th>Create Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{ int count = 1;}
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.SupplyChainId</td>
+                    <td>@item.BuyerName</td>
+                    <td>@item.StyleName</td>
+                    <td>@item.PoNumber</td>
+                    <td>@DateTime.Parse(item.OttDate).ToString("dd MMM yyyy")</td>
+                    <td>@item.RequestBy</td>
+                    <td>@DateTime.Parse(item.CreateTime).ToString("dd MMM yyyy h:mm tt")</td>
+                    <td>
+                        <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#supplyModal" onclick="GetDetailsSupplyRequest(@item.SupplyChainId,3)">Details</button>
+                    </td>
+                </tr>
+                count++;
+            }
+        </tbody>
+    </table>
+</div>
+
+

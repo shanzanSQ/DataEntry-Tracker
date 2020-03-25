@@ -19,6 +19,14 @@
             <td>@Model.UserName</td>
         </tr>
         <tr>
+            <th>SLA</th>
+            <td>@Model.RequestTime min</td>
+        </tr>
+        <tr>
+            <th>No Of Transaction</th>
+            <td>@Model.NoOfTransections</td>
+        </tr>
+        <tr>
             <th>Assign Time</th>
             <td>
                 @if (Model.CoUpdatedBy != "")
@@ -100,15 +108,17 @@
     </table>
 
 </div>
-<table style="text-align:center;width:80%;margin-left:10%;margin-top:2px">
-    <tr>
-        <td style="width:80%"><input type="text" style="width:100%" id="commentsText" /></td>
-        <td style="width:20%"> <input type="button" style="padding:2px" value="Comments" class="btn btn-sm btn-success" onclick="InsertComments(@Model.RequestCodId)" /></td>
-    </tr>
-</table>
+@if (Model.Progress != 8)
+{
+    <table style="text-align:center;width:80%;margin-left:10%;margin-top:2px">
+        <tr>
+            <td style="width:80%"><textarea type="text" style="width:100%;resize:none" id="commentsText" /></td>
+            <td style="width:20%"><input type="button" style="padding:2px" value="Comments" class="btn btn-sm btn-success" onclick="InsertComments(@Model.RequestCodId)" /></td>
+        </tr>
+    </table>
+}
 
-
-@if (Model.Progress == 1)
+@if (Model.Progress == 1 || Model.Progress == 9)
 {
     <br />
     <table width="100%">
@@ -118,16 +128,33 @@
                 <select id="assignTo" class="form-control" style="border-radius:0px;"></select>
             </td>
             <td>
+                <input id="slaUpdate" value="@Model.RequestTime" style="border-radius:0px;margin-left:10px" />
+            </td>
+            <td>
                 <button type="button" class="btn btn-info btn-sm" id="assignTodataentry">Assign </button>
             </td>
             <td>
                 <button type="button" class="btn btn-danger btn-sm" id="rejectRequest" onclick="UpdateStartOrEnd(@Model.RequestCodId,7)">Return </button>
             </td>
-            <td>
-                <button type="button" class="btn btn-success btn-sm" id="assignTodataentry" onclick="AssignRequestToDataEntry(@Model.RequestCodId,0)">Assign Own </button>
-            </td>
+            @*<td>
+                    <button type="button" class="btn btn-success btn-sm" id="assignTodataentry" onclick="AssignRequestToDataEntry(@Model.RequestCodId,0)">Assign Own </button>
+                </td>*@
         </tr>
     </table>
+}
+else if (Model.Progress == 10)
+{
+    <div style="text-align:center">
+        <button type="button" style="width:30%" class="btn btn-success  btn-sm" onclick="UpdateStartOrEnd(@Model.RequestCodId,6)">Complete</button>
+    </div>
+
+}
+else if (Model.Progress == 11)
+{
+    <div style="text-align:center">
+        <button type="button" style="width:30%" class="btn btn-danger  btn-sm" onclick="UpdateStartOrEnd(@Model.RequestCodId,6)">Quality Checked</button>
+    </div>
+
 }
 <br />
 
@@ -135,6 +162,11 @@
     $("#assignTodataentry").click(function () {
         var assignname = $("#assignTo").val();
         var requestId = parseInt($("#RequestCoId").val());
-        AssignRequestToDataEntry(requestId, assignname);
+        var updateSLA = $("#slaUpdate").val();
+        if (!$.isNumeric($("#slaUpdate").val())) {
+            $('#slaUpdate').css({ "border-color": "#FF0000" });
+        }
+        AssignRequestToDataEntry(requestId, assignname, updateSLA);
     });
 </script>
+ 

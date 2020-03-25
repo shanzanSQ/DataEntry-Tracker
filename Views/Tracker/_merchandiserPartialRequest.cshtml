@@ -1,0 +1,72 @@
+﻿@model IEnumerable<DataEntry_Tracker.Models.CommonModel>
+<div class="box">
+    <table class="table table-striped" id="marchandTable">
+        <thead>
+            <tr>
+                <th>R.Id</th>
+                <th>Task Id</th>
+                <th>Op. Name</th>
+                <th>Unit Name</th>
+                <th>Buyer Name</th>
+                <th>Style Name </th>
+                <th>#Transaction</th>
+                <th>SLA</th>
+                <th>Priority</th>
+                <th>Create Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{ int count = 1;}
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.RequestId</td>
+                    <td>@item.RequestCodId</td>
+                    <td>@item.BaseOperationName</td>
+                    <td>@item.UnitName</td>
+                    <td>@item.BuyerName</td>
+                    <td>@item.StyleName</td>
+                    <td>@item.NoOfTransections</td>
+                    <td>@item.RequestTime min</td>
+                    <td>@item.Priority</td>
+                    <td>@item.CreateDate.ToString("dd MMM yyyy h:mm tt")</td>
+                    <td>
+                        @switch (item.Progress)
+                        {
+                            case 1:
+                                <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#modalTaskPreview" onclick="GetInformationBYRequest(@item.RequestId,@item.RequestCodId,@item.BaseOperationId,@item.RivisionNo)">Pending</button>
+                                break;
+                            case 2:
+                                <button type="button" class="btn  btn-block btn-info btn-sm" data-toggle="modal" data-target="#modalTaskPreview" onclick="GetInformationBYRequest(@item.RequestId,@item.RequestCodId,@item.BaseOperationId,@item.RivisionNo)">D.E.O Assigned</button>
+                                break;
+                            case 3:
+                                <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#modalTaskPreview" onclick="GetInformationBYRequest(@item.RequestId,@item.RequestCodId,@item.BaseOperationId,@item.RivisionNo)">D.E.O Progress</button>
+                                break;
+                            case 4:
+                                <button type="button" class="btn  btn-block btn-default btn-sm" data-toggle="modal" data-target="#modalTaskPreview" onclick="GetInformationBYRequest(@item.RequestId,@item.RequestCodId,@item.BaseOperationId,@item.RivisionNo)">D.E.O Paused</button>
+                                break;
+                            case 5:
+                                <button type="button" class="btn  btn-block btn-primary btn-sm" data-toggle="modal" data-target="#modalTaskPreview" onclick="GetInformationBYRequest(@item.RequestId,@item.RequestCodId,@item.BaseOperationId,@item.RivisionNo)">D.E.O Progress</button>
+                                break;
+                            case 6:
+                                <button type="button" class="btn  btn-block btn-success btn-sm" data-toggle="modal" data-target="#modalTaskPreview" onclick="GetInformationBYRequest(@item.RequestId,@item.RequestCodId,@item.BaseOperationId,@item.RivisionNo)">Completed</button>
+                                break;
+                            case 7:
+                                <button type="button" class="btn  btn-block btn-danger btn-sm" data-toggle="modal" data-target="#modalTaskPreview" onclick="GetInformationBYRequest(@item.RequestId,@item.RequestCodId,@item.BaseOperationId,@item.RivisionNo)">Update</button>
+                                break;
+                            case 11:
+                                <button type="button" class="btn  btn-block btn-success btn-sm" data-toggle="modal" data-target="#modalTaskPreview" onclick="GetInformationBYRequest(@item.RequestId,@item.RequestCodId,@item.BaseOperationId,@item.RivisionNo)">D.E.O Complete</button>
+                                break;
+                            default:
+                                <button type="button" class="btn  btn-block btn-info btn-sm" data-toggle="modal" data-target="#modalTaskPreview" onclick="GetInformationBYRequest(@item.RequestId,@item.RequestCodId,@item.BaseOperationId,@item.RivisionNo)">Details</button>
+                                break;
+                        }
+                    </td>
+                </tr>
+                count++;
+                        }
+        </tbody>
+    </table>
+</div>
+

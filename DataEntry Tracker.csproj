@@ -123,9 +123,11 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\AdminUserController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\SupplyChainController.cs" />
     <Compile Include="Controllers\TrackerController.cs" />
     <Compile Include="DAL\AdminUserDAL.cs" />
     <Compile Include="DAL\HomeDAL.cs" />
+    <Compile Include="DAL\SupplyChainDAL.cs" />
     <Compile Include="DAL\TrackerDAL.cs" />
     <Compile Include="DataManager\DataAccessManager.cs" />
     <Compile Include="DataManager\DataBase.cs" />
@@ -137,9 +139,12 @@
     </Compile>
     <Compile Include="Models\CommentsTable.cs" />
     <Compile Include="Models\CommonModel.cs" />
+    <Compile Include="Models\DashboardModule.cs" />
     <Compile Include="Models\FileUploadModel.cs" />
+    <Compile Include="Models\LoadPoCatagory.cs" />
     <Compile Include="Models\MessageModel.cs" />
     <Compile Include="Models\ModuleClassModel.cs" />
+    <Compile Include="Models\RequestSupplyChain.cs" />
     <Compile Include="Models\ResultResponse.cs" />
     <Compile Include="Models\UserInformation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -149,7 +154,9 @@
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\bootstrap-multiselect.css" />
     <Content Include="Content\coordinatorstyle.css" />
+    <Content Include="Content\datable.min.css" />
     <Content Include="Content\datatables.net-bs\css\dataTables.bootstrap.css" />
     <Content Include="Content\datatables.net-bs\css\dataTables.bootstrap.min.css" />
     <Content Include="Content\datatables.net-bs\js\dataTables.bootstrap.js" />
@@ -184,6 +191,8 @@
     <Content Include="Content\datatables.net\Readme.md" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
+    <Content Include="Scripts\bootstrap-multiselect.js" />
+    <Content Include="Scripts\datatable.min.js" />
     <Content Include="Scripts\javascriptfiletracker.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />
@@ -230,6 +239,22 @@
     <Content Include="Views\Tracker\_addFilesLog.cshtml" />
     <Content Include="Views\AdminUser\AdminUserView.cshtml" />
     <Content Include="Views\AdminUser\_allRequestPartialView.cshtml" />
+    <Content Include="Views\AdminUser\_AdminShowAllTaskByRequest.cshtml" />
+    <Content Include="Views\Tracker\_coordinatorAssignedProgress.cshtml" />
+    <Content Include="Views\AdminUser\_requestdetails_admin.cshtml" />
+    <Content Include="Views\AdminUser\_adminTaskPartial.cshtml" />
+    <Content Include="Views\Tracker\_merchandiserPartialRequest.cshtml" />
+    <Content Include="Views\AdminUser\_reportCordinator.cshtml" />
+    <Content Include="Views\Tracker\_partialViewSendSupplyChain.cshtml" />
+    <Content Include="Views\SupplyChain\_supplyChainMenuMerchand.cshtml" />
+    <Content Include="Views\SupplyChain\_supplyChainDetailsMarchand.cshtml" />
+    <Content Include="Views\SupplyChain\SupplyChainCoordinator.cshtml" />
+    <Content Include="Views\SupplyChain\_CoordinatorDetailsPartial.cshtml" />
+    <Content Include="Views\SupplyChain\_coordinatorPartial.cshtml" />
+    <Content Include="Views\SupplyChain\SupplyUserView.cshtml" />
+    <Content Include="Views\SupplyChain\_userPartialView.cshtml" />
+    <Content Include="Views\SupplyChain\_userDetailsView.cshtml" />
+    <Content Include="Views\SupplyChain\_createSupplyChain.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

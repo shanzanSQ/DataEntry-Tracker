@@ -1,16 +1,17 @@
 ﻿@model IEnumerable<DataEntry_Tracker.Models.CommonModel>
 
-    <div class="box">
-            <table class="table table-striped" id="requestTableList">
+    <div class="box" style="overflow-x:auto">
+            <table class="table table-striped" id="requestTableList" >
                 <thead>
                     <tr>
-                        <th>RS</th>
                         <th>Request Id</th>
                         <th>Unit Name</th>
                         <th>Buyer Name</th>
-                        <th>Session Name</th>
                         <th>Style Name </th>
-                        <th>Revision No</th>
+                        <th>Request By</th>
+                        <th>No Of Task</th>
+                        <th>Pending</th>
+                        <th>CoOrdinator</th>
                         <th>Create Date</th>
                         <th>Action</th>
                     </tr>
@@ -20,15 +21,16 @@
                     @foreach (var item in Model)
                     {
                         <tr id="@item.RequestId">
-                            <td>@count</td>
                             <td>@item.RequestId</td>
                             <td>@item.UnitName</td>
                             <td>@item.BuyerName</td>
-                            <td>@item.SeasonName</td>
                             <td>@item.StyleName</td>
+                            <td>@item.UserName</td>
                             <td>@item.RivisionNo</td>
+                            <td style="color:red">@item.Progress</td>
+                            <td >@item.CoordinatorName</td>
                             <td>@item.CreateDate.ToString("dd MMM yyyy h:mm tt")</td>
-                            <td> <button type="button" class="btn  btn-block btn-success btn-sm" onclick="GetDetailsInformationBYRequestId(@item.RequestId)">Preview</button></td>
+                            <td> <button type="button" class="btn  btn-block btn-success btn-sm" onclick="AdminGetDetails(@item.RequestId)">Tasks</button></td>
                         </tr>
                         count++;
                     }

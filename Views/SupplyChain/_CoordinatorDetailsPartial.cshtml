@@ -1,0 +1,131 @@
+﻿@model DataEntry_Tracker.Models.RequestSupplyChain
+<style type="text/css">
+</style>
+<div id="modal_task">
+    <table class="" width="100%" border="1">
+        <tbody>
+            <tr>
+                <th width="30%">S.Request ID </th>
+                <td width="70%">@Model.SupplyChainId</td>
+            </tr>
+            <tr>
+                <th>Po Number</th>
+                <td>@Model.PoNumber</td>
+            </tr>
+            <tr>
+                <th>Sub Catagory Name</th>
+                <td>@Model.PoCatagoryName</td>
+            </tr>
+            <tr>
+                <th>Remarks</th>
+                <td>@Model.Remarks</td>
+            </tr>
+            <tr>
+                <th>Co-ordinator Name</th>
+                <td>@Model.CoordinatorName</td>
+            </tr>
+            <tr>
+                <th>Supply Chain User Name</th>
+                <td>@Model.SpUserName</td>
+            </tr>
+            <tr>
+                <th>Create Date</th>
+                <td>@DateTime.Parse(Model.CreateTime).ToString("dd MMM yyyy h:mm:ss tt")</td>
+            </tr>
+            <tr>
+                <th>OTT Date</th>
+                <td>@DateTime.Parse(Model.OttDate).ToString("dd MMM yyyy")</td>
+            </tr>
+            <tr>
+                <th>Assign Time</th>
+                <td>
+                    @if (Model.AssignTime != "")
+                    {@DateTime.Parse(Model.AssignTime).ToString("dd MMM yyyy h:mm:ss tt")}
+                </td>
+            </tr>
+            <tr>
+                <th>Entry Started</th>
+                <td>
+                    @if (Model.StartTime != "")
+                    {@DateTime.Parse(Model.StartTime).ToString("dd MMM yyyy h:mm:ss tt")}
+                </td>
+            </tr>
+            <tr>
+                <th>Entry End</th>
+                <td>
+                    @if (Model.EndTime != "")
+                    {@DateTime.Parse(Model.EndTime).ToString("dd MMM yyyy h:mm:ss tt")}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    @if (Model.fileUploadModel != null)
+    {
+        <table border="1" width="100%" style="text-align:center" id="modalfilelist">
+            <caption>Files & Instructions</caption>
+            <tr>
+                <th>
+                    File Name
+                </th>
+                <th>
+                    Action
+                </th>
+            </tr>
+            @foreach (var item in Model.fileUploadModel)
+            {
+                <tr id="@item.FileUploadId">
+                    <td>
+                        @item.FileUploadName
+                    </td>
+                    <td>
+                        @Html.ActionLink("Download", "DownloadFile", "Tracker", new { filepath = item.FileUploadPath.ToString(), filename = item.FileUploadName.ToString() }, new { @target = "_blank" })
+                    </td>
+                </tr>
+            }
+        </table>
+    }
+
+    @*<p>Comments Section</p>
+        <div id="comments_section" class="container" style="overflow-wrap:inherit; width:100%;overflow-y: scroll;height:100px;border:1px solid;margin-top:5px">
+            <table width="100%" id="commentsSection">
+            </table>
+
+        </div>*@
+    <br />
+    @if (Model.Progressid == 1 || Model.Progressid == 4)
+    {
+
+        <table width="100%">
+            <tr style="text-align:center">
+                <td><label for="assignsupply">Assign To:  </label></td>
+                <td>
+                    <select id="assignsupply" class="form-control" style="border-radius:0px;"></select>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-success btn-sm" onclick="CoordinatorAssign(@Model.SupplyChainId)">Assign </button>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm" id="rejectRequest" onclick="UpdateOrClose(@Model.SupplyChainId,5)">Return </button>
+                </td>
+            </tr>
+        </table>
+    }
+    else if (Model.Progressid == 6)
+    {
+        <div style="text-align:center">
+            <button type="button" class="btn btn-success btn-sm" onclick="UpdateOrClose(@Model.SupplyChainId,7)">Pending Payment</button>
+        </div>
+
+    }
+    else if (Model.Progressid == 7)
+    {
+        <div style="text-align:center">
+            <button type="button" class="btn btn-success btn-sm"  onclick="UpdateOrClose(@Model.SupplyChainId,8)">Payment Complete</button>
+        </div>
+
+    }
+
+</div>
+
+

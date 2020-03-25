@@ -5,9 +5,14 @@
 </style>
 <div >
     <div class="row">
-        <div class="col-md4">
+        <div class="col-md4" style="height: 200px;overflow-y:auto">
             <h4>Currently Working</h4>
-            <table width="100%" id="currentlyworkingdiv" border="1" class="table table-striped" style="text-align:center" >
+            <table width="100%" id="currentlyworkingdiv" border="1" class="table table-striped" style="text-align:center">
+            </table>
+        </div>
+        <div class="col-md4" style="height:300px;overflow-y:auto">
+            <h4>Assigned Work</h4>
+            <table width="100%" id="workAssignTable" border="1" class="table table-striped" style="text-align:center">
             </table>
         </div>
     </div>
@@ -17,7 +22,7 @@
 
     interval=setInterval(function(){
         CurrentlyWorking(0);
-    }, 30000);
+    }, 1000);
     function CurrentlyWorking(progress) {
         var urlpath = '@Url.Action("DataEntryCurrentProcess", "Tracker")';
             $.ajax({
@@ -27,17 +32,25 @@
                 async: true,
                     success: function(data) {
                         if (data) {
+                            AssignedWork();
                             $('#currentlyworkingdiv').empty();
-                            var newRow = $('<tr > <th width="15%">Operator Name </th><th width="15%">Operation Name </th><th width="10%">SLA Count </th><th width="10%">No Of Transections</th><th width="20%">Work Started </th><th width="10%">Total Work </th><th width="20%">Percentage</th></tr>');
+                            var newRow = $('<tr > <th width="15%">Operator Name </th><th width="15%">Operation Name </th><th width="10%">SLA Count </th><th width="10%">No Of Transactions</th><th width="20%">Work Started </th><th width="10%">Total Work </th><th width="20%">Percentage</th></tr>');
                             $("#currentlyworkingdiv").append(newRow);
                             for (var i = 0; i < data.length; i++) {
                                 var color = "";
+                                var workPercentages = 0;
                                 if (data[i].WorkPercentage >= 0 && data[i].WorkPercentage < 50) {
                                     color = '#11C8CF';
+                                    workPercentages = data[i].WorkPercentage;
                                 } else if (data[i].WorkPercentage >= 50 && data[i].WorkPercentage < 80) {
-                                    color='#F05705'
+                                    color = '#F05705'
+                                    workPercentages = data[i].WorkPercentage;
+                                } else if (data[i].WorkPercentage >= 50 && data[i].WorkPercentage < 100) {
+                                    color = '#169706'
+                                    workPercentages = data[i].WorkPercentage;
                                 } else {
-                                    color='#169706'
+                                    color = '#169706'
+                                    workPercentages = 100;
                                 }
 
                                     var newRow = $('<tr >');
@@ -47,10 +60,41 @@
                                         cols += '<td>' + data[i].RequestTime + 'min</td>';
                                         cols += '<td>' + data[i].NoOfTransections + '</td>';
                                         cols += '<td>' + data[i].DataEntryCreated + '</td>';
-                                        cols += '<td>' + data[i].WorkProgress + 'min</td>';
-                                        cols += '<td><strong style="color:'+color+'">'+data[i].WorkPercentage+ '%</strong></td></tr>';
+                                cols += '<td>' + data[i].WorkProgress + 'min</td>';
+                                cols += '<td><strong style="color:' + color + '">' + workPercentages + '%</strong></td></tr>';
                                         newRow.append(cols);
                                      $("#currentlyworkingdiv").append(newRow);
+                                 } 
+                        }
+                    }
+            });
+    }
+
+
+    function AssignedWork() {
+        var urlpath = '@Url.Action("DataEntryAssignProgress", "AdminUser")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { },
+                async: true,
+                    success: function(data) {
+                        if (data) {
+                            $('#workAssignTable').empty();
+                            var newRow = $('<tr > <th width="20%">Operator Name </th><th width="15%">Total Workload </th><th width="15%">Todays Assigned</th><th width="15%">Todays Completed</th><th width="15%">Current Working </th</tr>');
+                            $("#workAssignTable").append(newRow);
+                            for (var i = 0; i < data.length; i++) {
+                                    var newRow = $('<tr >');
+                                    var cols = "";
+                                cols += '<td>' + data[i].UserName + '</td>';
+                                cols += '<td>' + data[i].CurrentWorkload + 'min</td>';
+                                cols += '<td>' + data[i].TodayAssign + ' min</td>';
+                                        cols += '<td>' + data[i].TotalTodaysCompleted + ' min</td>';
+                                        cols += '<td>' + data[i].WorkingTime + ' min</td>';
+                                       // cols += '<td> ' + data[i].WorkPercentage + '</td>';
+                                //cols += '<td><strong style="color:' + color + '">' + workPercentages + '%</strong></td></tr>';
+                                        newRow.append(cols);
+                                     $("#workAssignTable").append(newRow);
                                  } 
                         }
                     }

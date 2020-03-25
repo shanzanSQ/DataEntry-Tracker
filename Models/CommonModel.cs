@@ -33,6 +33,8 @@ namespace DataEntry_Tracker.Models
         public string WorkProgress { get; set; }
         public string WorkPercentage { get; set; }
         public string Priority { get; set; }
+        public string CoordinatorName { get; set; }
+        public string Aging { get; set; }
         public int NoOfTransections { get; set; }
         public List<FileUploadModel> fileUploadModelsList { get; set; }
         public List<CommonModel> RevisionList { get; set; }

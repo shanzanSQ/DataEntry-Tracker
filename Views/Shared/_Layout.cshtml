@@ -7,6 +7,8 @@
     <link href="~/Content/sweetalert.css" rel="stylesheet" />
     <!-- DataTables -->
     <link href="~/Content/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+
+    @*<link href="~/Content/datable.min.css" rel="stylesheet" />*@
     @Styles.Render("~/Content/bootstrap.min.css")
     @Scripts.Render("~/bundles/modernizr")
 </head>
@@ -43,9 +45,8 @@
     </div>
     <div class="container-fluid body-content" style="margin-top:60px">
         @RenderBody()
-        
+
         <footer>
-           
         </footer>
     </div>
 
@@ -53,6 +54,7 @@
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
     <script>
+        var interval;
         ModuleWiseMenu();
         function ModuleWiseMenu() {
             var origin = window.location.origin;
@@ -73,7 +75,9 @@
         }
 
         $("#logoutButton").click(function () {
-        var urlpath = '@Url.Action("Logout", "Account")';
+            clearInterval(interval);
+            var urlpath = '@Url.Action("Logout", "Account")';
+
             $.ajax({
                 contentType: "application/json; charset=utf-8",
                 data: {},
@@ -97,8 +101,8 @@
         });
     </script>
     <script src="~/Content/datatables.net/js/jquery.dataTables.min.js"></script>
-    <!-- DataTables -->
     <script src="~/Content/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
     <script src="~/Scripts/sweetalert.min.js"></script>
+    @*<script src="~/Scripts/datatable.min.js"></script>*@
 </body>
 </html>

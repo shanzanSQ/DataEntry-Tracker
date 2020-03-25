@@ -1,17 +1,21 @@
 ﻿
 <div>
     <div class="row" id="topDivition">
-        <div class="col-md-3">
-            <input class="btn btn-success btn-sm" onclick="addRequest()" value="Add New Request" />
-        </div>
-        <div class="col-md-3">
+        <div class="col-md-6">
+            <div class="col-md-6">
+                <input class="btn btn-success btn-sm" onclick="addRequest()" value="Add New Request" />
+            </div>
+            <div class="col-md-6">
 
+            </div>
         </div>
-        <div class="col-md-3">
-            <input type="text" class="form-control form-control-sm" id="requestIdInput" placeholder="Enter request number" />
-        </div>
-        <div class="col-md-3">
-            <input class="btn btn-primary btn-sm" id="revisionRequest" value="Revision Request" />
+        <div class="col-md-6" id="requestrivision">
+            <div class="col-md-6">
+                <input type="text" class="form-control form-control-sm" id="requestIdInput" placeholder="Enter request number" />
+            </div>
+            <div class="col-md-6">
+                <input class="btn btn-primary btn-sm" id="revisionRequest" value="Revision Request" />
+            </div>
         </div>
     </div>
     <br />
@@ -65,6 +69,7 @@
 <script type="text/javascript">
     function addRequest() {
         $('#add_newRequest').show();
+        $('#requestrivision').hide();
           LoadUnits();
           LoadBuyer();
     }

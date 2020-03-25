@@ -19,6 +19,14 @@
             <td>@Model.UserName</td>
         </tr>
         <tr>
+            <th>No of Operation</th>
+            <td>@Model.NoOfTransections</td>
+        </tr>
+        <tr>
+            <th>Estimated Time</th>
+            <td>@Model.RequestTime min</td>
+        </tr>
+        <tr>
             <th>Assign Time</th>
             <td>
                 @if (Model.CoUpdatedBy != "")
@@ -56,7 +64,7 @@
 
 @if (Model.fileUploadModelsList != null)
 {
-    <table border="1" width="100%" style="text-align:center">
+    <table border="1" width="100%" style="text-align:center" id="modalfilelist">
         <caption>Files & Instructions</caption>
         <tr>
             <th>
@@ -91,44 +99,86 @@
             </tr>
             count++;
         }
-
     </table>
 }
-<p>Comments Section</p>
-<div id="comments_section" class="container" style="overflow-wrap:inherit; width:100%;overflow-y: scroll;height:100px;border:1px solid;margin-top:5px">
-    <table width="100%" id="coordinatorComments">
-    </table>
-
+<div id="showComments" style="display:none">
+    <p>Comments Section</p>
+    <div id="comments_section" class="container" style="overflow-wrap:inherit; width:100%;overflow-y: scroll;height:100px;border:1px solid;margin-top:5px">
+        <table width="100%" id="coordinatorComments">
+        </table>
+    </div>
+    @if (Model.Progress != 8)
+    {
+        <table style="text-align:center;width:80%;margin-left:10%;margin-top:2px">
+            <tr>
+                <td style="width:80%"><input type="text" style="width:100%" id="commentsText" /></td>
+                <td style="width:20%"> <input type="button" style="padding:2px" value="Add Comments" class="btn btn-sm btn-success" onclick="InsertComments(@Model.RequestCodId)" /></td>
+            </tr>
+        </table>
+    }
 </div>
-<table style="text-align:center;width:80%;margin-left:10%;margin-top:2px">
-    <tr>
-        <td style="width:80%"><input type="text" style="width:100%" id="commentsText" /></td>
-        <td style="width:20%"> <input type="button" style="padding:2px" value="Comments" class="btn btn-sm btn-success" onclick="InsertComments(@Model.RequestCodId)" /></td>
-    </tr>
-</table>
+
 <br />
 <div style="text-align:center">
     @if (Model.Progress == 2)
     {
-        <button type="button" style="width:30%" class="btn btn-success btn-sm" onclick="UpdateStartOrEnd(@Model.RequestCodId,3)">Start</button>
-        <button type="button" style="width:30%" class="btn btn-danger btn-sm" onclick="UpdateStartOrEnd(@Model.RequestCodId,7)">Returns</button>
+        <button type="button" style="width:30%" class="btn btn-info btn-sm" onclick="showComments()">Show Comments</button>
+        <button type="button" style="width:30%;" class="btn btn-success btn-sm" onclick="UpdateStartOrEnd(@Model.RequestCodId,3)">Start</button>
+        <button type="button" style="width:30%" class="btn btn-danger btn-sm" onclick="UpdateStartOrEnd(@Model.RequestCodId,9)">Returns</button>
     }
     else if (Model.Progress == 3 || Model.Progress == 5)
     {
-        <button type="button" style="width:40%;background-color:yellow" class="btn btn-default btn-sm form-control" onclick="UpdateStartOrEnd(@Model.RequestCodId,4)">Pause</button>
-        <button type="button" style="width:30%" class="btn btn-success  btn-sm form-control" onclick="UpdateStartOrEnd(@Model.RequestCodId,6)">Complete</button>
+        if (Model.BaseOperationId == 7 || Model.BaseOperationId == 18)
+        {
+            <div class="row" id="addPOdiv">
+                <table style="text-align:center">
+                    <tr>
+                        <td width="25%"><button type="button" style="width:95%" class="btn btn-info btn-sm" onclick="showComments()">Comments</button></td>
+                        <td width="25%"><input type="file" id="attachcompleteFile" style="width:95%" class="btn btn-success btn-sm" onchange="uploadFiles('#attachcompleteFile',@Model.BaseOperationId, @Model.RequestId,'Completed File',@Model.RivisionNo, '#modalfilelist');" /></td>
+                        <td width="25%"><button type="button" style="background-color:yellow;width:95%" class="btn btn-default btn-sm" onclick="UpdateStartOrEnd(@Model.RequestCodId,4)">Pause</button></td>
+                        <td width="25%"><button type="button" style="width:95%" class="btn btn-primary btn-sm" onclick="AddPO(@Model.NoOfTransections)">ADD PO</button></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="row" id="insertPO" style="display:none">
+                <div class="col-md-6">
+                    <table id="insertPOTable" width="100%" border="1">
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <button type="button" style="display:inline-block" class="btn btn-success btn-sm" onclick="PoUploadTODatabase(@Model.RequestCodId,@Model.NoOfTransections)">PO Update and Complete</button>
+                </div>
+            </div>
+        }
+        else
+        {
+            <table style="text-align:center">
+                <tr>
+                    <td width="25%"><button type="button" style="width:95%" class="btn btn-info btn-sm" onclick="showComments()">Comments</button></td>
+                    <td width="25%"><input type="file" id="attachcompleteFile" style="width:95%" class="btn btn-success btn-sm" onchange="uploadFiles('#attachcompleteFile',@Model.BaseOperationId, @Model.RequestId,'Completed File',@Model.RivisionNo, '#modalfilelist');" /></td>
+                    <td width="25%"><button type="button" style="background-color:yellow;width:95%" class="btn btn-default btn-sm" onclick="UpdateStartOrEnd(@Model.RequestCodId,4)">Pause</button></td>
+                    <td width="25%"><button type="button" style="width:95%" class="btn btn-success  btn-sm" onclick="UpdateStartOrEnd(@Model.RequestCodId,11)">Complete</button></td>
+                </tr>
+            </table>
+        }
+
     }
     else if (Model.Progress == 4)
     {
-        <button type="button" style="width:30%" class="btn btn-info btn-sm form-control" onclick="UpdateStartOrEnd(@Model.RequestCodId,5)">Resume</button>
-
+        <button type="button" style="width:30%" class="btn btn-info btn-sm" onclick="showComments()">Comments</button>
+        <button type="button" style="width:30%" class="btn btn-info btn-sm" onclick="UpdateStartOrEnd(@Model.RequestCodId,5)">Resume</button>
+        <button type="button" style="width:30%" class="btn btn-danger btn-sm" onclick="UpdateStartOrEnd(@Model.RequestCodId,9)">Return</button>
+    }
+    else
+    {
+        <button type="button" style="width:30%" class="btn btn-info btn-sm" onclick="showComments()">Comments</button>
     }
 </div>
 
-@*<script type="text/javascript">
-        $("#assignTodataentry").click(function () {
-            var assignname = $("#assignTo").val();
-            var requestId = parseInt($("#RequestCoId").val());
-            AssignRequestToDataEntry(requestId, assignname);
-        });
-    </script>*@
+            @*<script type="text/javascript">
+                       $("#assignTodataentry").click(function () {
+                           var assignname = $("#assignTo").val();
+                           var requestId = parseInt($("#RequestCoId").val());
+                           AssignRequestToDataEntry(requestId, assignname);
+                       });
+                </script>*@

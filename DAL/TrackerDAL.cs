@@ -103,6 +103,36 @@ namespace DataEntry_Tracker.DAL
                 accessManager.SqlConnectionClose();
             }
         }
+
+        public List<LoadPoCatagory> LoadPoFromDataBase(int userId)
+        {
+            List<LoadPoCatagory> poCatagories = new List<LoadPoCatagory>();
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.DataEntryTracker);
+                List<SqlParameter> aParameters = new List<SqlParameter>();
+                aParameters.Add(new SqlParameter("@userId", userId));
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_LoadPOCatagory", aParameters);
+                while (dr.Read())
+                {
+                    LoadPoCatagory poCatagory = new LoadPoCatagory();
+                    poCatagory.PoCatagoryId = (int)dr["PoCatagoryId"];
+                    poCatagory.PoCatagoryName = dr["PoCatagoryName"].ToString();
+                    poCatagories.Add(poCatagory);
+                }
+
+                return poCatagories;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
         public List<CommonModel> GetSeasonFromDatabas(int buyerId,int userId)
         {
             List<CommonModel> commonModelList = new List<CommonModel>();
@@ -197,7 +227,6 @@ namespace DataEntry_Tracker.DAL
                 accessManager.SqlConnectionClose();
             }
         }
-
         public CommonModel SaveRequestReturnPrimarykey(CommonModel common,int userId)
         {
             try
@@ -230,7 +259,6 @@ namespace DataEntry_Tracker.DAL
                 accessManager.SqlConnectionClose();
             }
         }
-
         public FileUploadModel FileUploadsToDataBase(int optionId, int requestId, string fileName, string filePath, string instructions,int userId,int RivisionNo)
         {
             FileUploadModel fileUploadModels = new FileUploadModel();
@@ -267,9 +295,38 @@ namespace DataEntry_Tracker.DAL
                 accessManager.SqlConnectionClose();
             }
         }
+        public FileUploadModel RmpoFileUploadToDatabase(int requestId, string fileName, string filePath,int userId)
+        {
+            FileUploadModel fileUploadModels = new FileUploadModel();
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.DataEntryTracker);
+                List<SqlParameter> aParameters = new List<SqlParameter>();
+                aParameters.Add(new SqlParameter("@uploadFileName", fileName));
+                aParameters.Add(new SqlParameter("@uploadFilepath", filePath));
+                aParameters.Add(new SqlParameter("@requestId", requestId));
+                aParameters.Add(new SqlParameter("@userId", userId));
 
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_RmpoFileUploadDatabase", aParameters);
+                while (dr.Read())
+                {
+                    fileUploadModels.FileUploadId = (int)dr["RMPOFileId"];
+                    fileUploadModels.FileUploadName = dr["RMPOFileName"].ToString();
+                    fileUploadModels.FileUploadPath = dr["UploadFilesPath"].ToString();
+                }
 
-        public string DeleteFile(int fileUploadId,int UserID)
+                return fileUploadModels;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+        public string DeleteFile(int fileUploadId,int UserID,int TableName)
         {
             string filePath = "";
             try
@@ -278,6 +335,7 @@ namespace DataEntry_Tracker.DAL
                 List<SqlParameter> aParameters = new List<SqlParameter>();
                 aParameters.Add(new SqlParameter("@fileId", fileUploadId));
                 aParameters.Add(new SqlParameter("@userID", UserID));
+                aParameters.Add(new SqlParameter("@TableName", TableName));
                 SqlDataReader dr= accessManager.GetSqlDataReader("sp_deleteFilesFromDatabase", aParameters);
                 while(dr.Read()){
                     filePath = dr["UploadFilesPath"].ToString();
@@ -295,7 +353,6 @@ namespace DataEntry_Tracker.DAL
                 accessManager.SqlConnectionClose();
             }
         }
-
         public List<CommonModel> GetAllRequestById(int userID)
         {
             List<CommonModel> requestList = new List<CommonModel>();
@@ -353,6 +410,7 @@ namespace DataEntry_Tracker.DAL
                     requestmodal.Priority = dr["Priority"].ToString();
                     requestmodal.Instruction = dr["Instructions"].ToString();
                     requestmodal.NoOfTransections = (int)dr["NoOfTransections"];
+                    requestmodal.UserName = dr["UserName"].ToString();
                     requestmodal.RequestTime = float.Parse(dr["RequestTime"].ToString());
                     requestList.Add(requestmodal);
 
@@ -370,7 +428,6 @@ namespace DataEntry_Tracker.DAL
                 accessManager.SqlConnectionClose();
             }
         }
-
         public CommonModel GetRequestInformationByReId(int RequestId)
         {
             CommonModel requestmodal = new CommonModel();
@@ -388,6 +445,7 @@ namespace DataEntry_Tracker.DAL
                     requestmodal.UnitName = dr["UnitName"].ToString();
                     requestmodal.StyleName = dr["StyleName"].ToString();
                     requestmodal.RivisionNo = (int)dr["RevisionNo"];
+                    requestmodal.UserName = dr["UserName"].ToString();
                     requestmodal.CreateDate = (DateTime)dr["CreateDate"];
                 }
                // requestmodal.fileUploadModelsList = new List<FileUploadModel>();
@@ -407,6 +465,7 @@ namespace DataEntry_Tracker.DAL
         public bool SubmitRequestToTracker(int RequestId,int UserId,string Instruction, int OperationId, int Priority,int NoOfTransection)
         {
             bool result = false;
+            string estimatedTime = GetEstimatedTime(UserId, OperationId, Priority, NoOfTransection);
             try
             {
                 accessManager.SqlConnectionOpen(DataBase.DataEntryTracker);
@@ -417,6 +476,7 @@ namespace DataEntry_Tracker.DAL
                 aParameters.Add(new SqlParameter("@OperationId", OperationId));
                 aParameters.Add(new SqlParameter("@Priority", Priority));
                 aParameters.Add(new SqlParameter("@NoOfTransections", NoOfTransection));
+                aParameters.Add(new SqlParameter("@EstimatedEndTime", estimatedTime));
                 result= accessManager.SaveData("sp_SubmitRequestToTracker", aParameters);
                 return result;
             }
@@ -429,6 +489,33 @@ namespace DataEntry_Tracker.DAL
                 accessManager.SqlConnectionClose();
             }
         }
+
+        public bool SubmitTOSupplyChain(int RequestId, string Remarks, string CatagoryId, string OttDate,int UserId,int PONumber)
+        {
+            bool result = false;
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.DataEntryTracker);
+                List<SqlParameter> aParameters = new List<SqlParameter>();
+                aParameters.Add(new SqlParameter("@UserId", UserId));
+                aParameters.Add(new SqlParameter("@RequestId", RequestId));
+                aParameters.Add(new SqlParameter("@CatagoryId", CatagoryId));
+                aParameters.Add(new SqlParameter("@Remarks", Remarks));
+                aParameters.Add(new SqlParameter("@OttDate", OttDate));
+                aParameters.Add(new SqlParameter("@PoNumber", PONumber));
+                result = accessManager.SaveData("sp_SubmitToSupplyChain", aParameters);
+                return result;
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+
         public List<CommonModel> GetAllPendingRequest(int pendingNo, int userId,int dataEntryORco)
         {
             List<CommonModel> commonModelList = new List<CommonModel>();
@@ -456,6 +543,8 @@ namespace DataEntry_Tracker.DAL
                     common.CreateDate = (DateTime)dr["CreateTime"];
                     common.Progress = (int)dr["ProgessId"];
                     common.Priority = dr["Priority"].ToString();
+                    common.AssignTo = dr["AssignTo"].ToString();
+                    common.NoOfTransections = (int)dr["NoOfTransections"];
                     common.RequestTime = float.Parse(dr["RequestTime"].ToString());
                     commonModelList.Add(common);
                 }
@@ -582,6 +671,7 @@ namespace DataEntry_Tracker.DAL
                     fileupload.OperationID = (int)dr["OperationId"];
                     fileupload.OperationName = dr["BaseOperationName"].ToString();
                     fileupload.RevisionNo = (int)dr["RivisionNo"];
+                    fileupload.Instructions =dr["Instructions"].ToString();
                     fileuploadlist.Add(fileupload);
                 }
 
@@ -598,7 +688,7 @@ namespace DataEntry_Tracker.DAL
             }
         }
 
-        public bool AssignToDataEntryOperator(int RequestId,int UserId,int AssignTo)
+        public bool AssignToDataEntryOperator(int RequestId,int UserId,int AssignTo,int UpdateSLA)
         {
             bool result = false;
             try
@@ -608,6 +698,7 @@ namespace DataEntry_Tracker.DAL
                 aParameters.Add(new SqlParameter("@RequestId", RequestId));
                 aParameters.Add(new SqlParameter("@CoordinatorId", UserId));
                 aParameters.Add(new SqlParameter("@AssignTo", AssignTo));
+                aParameters.Add(new SqlParameter("@UpdateSLA", UpdateSLA));
                 result = accessManager.SaveData("sp_AssignToDataEntryTracker", aParameters);
                 return result;
             }
@@ -708,7 +799,7 @@ namespace DataEntry_Tracker.DAL
                 accessManager.SqlConnectionClose();
             }
         }
-        public int CheckDataEntryEngagged(int UserId)
+        public int CheckDataEntryEngagged(int UserId,int status)
         {
             int count= 0;
             try
@@ -716,6 +807,7 @@ namespace DataEntry_Tracker.DAL
                 accessManager.SqlConnectionOpen(DataBase.DataEntryTracker);
                 List<SqlParameter> aParameters = new List<SqlParameter>();;
                 aParameters.Add(new SqlParameter("@UserId", UserId));
+                aParameters.Add(new SqlParameter("@status", status));
                 SqlDataReader sqlDataReader = accessManager.GetSqlDataReader("sp_CheckDataEntryEngagged", aParameters);
                 while (sqlDataReader.Read())
                 {
@@ -792,7 +884,8 @@ namespace DataEntry_Tracker.DAL
                     modeldetails.RequestId = (int)dr["RequestId"];
                     modeldetails.BaseOperationId = (int)dr["OperationId"];
                     modeldetails.RivisionNo = (int)dr["RivisionNo"];
-                    
+                    modeldetails.NoOfTransections = (int)dr["NoOfTransections"];
+                    modeldetails.RequestTime = float.Parse(dr["RequestTime"].ToString());
                 }
                 modeldetails.fileUploadModelsList = new List<FileUploadModel>();
                 modeldetails.fileUploadModelsList = GetFilesByCoordinator(RequestId,OperationId,RivisionId,UserId,ReqcodId);
@@ -863,7 +956,92 @@ namespace DataEntry_Tracker.DAL
                 accessManager.SqlConnectionClose();
             }
         }
-    }
-    
+        public string GetEstimatedTime(int userId,int operationId,int priority,int noTransc)
+        {
+            string estimatedTime = "";
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.DataEntryTracker);
+                List<SqlParameter> aParameters = new List<SqlParameter>();
+                aParameters.Add(new SqlParameter("@userId", userId));
+                aParameters.Add(new SqlParameter("@operationId", operationId));
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_EstimatedTime", aParameters);
+                while (dr.Read())
+                {
+                    int OperationTime = ((int)dr["TimeLimit"]* noTransc)+ Convert.ToInt32(((int)dr["TimeLimit"] * noTransc) * 15 / 100);
+                    int DefaultTime =Convert.ToInt32(dr["CoordinatorDefault"].ToString());
+                    int UrgentTime = Convert.ToInt32(dr["CoordinatorUrgent"].ToString());
+                    int DataEntryTime = Convert.ToInt32(dr["DataEntryTotal"].ToString());
+                    int NoOfDataEntry = Convert.ToInt32(dr["Number"].ToString());
+                    int finalTime = 0;
+                    if (priority == 1)
+                    {
+                        finalTime = OperationTime + ((DefaultTime + UrgentTime + DataEntryTime)/NoOfDataEntry);
+                    }
+                    else
+                    {
+                        finalTime =OperationTime + ((UrgentTime + DataEntryTime)/NoOfDataEntry);
+                    }
+                    DateTime date = AddWithinWorkingHours(DateTime.Now,TimeSpan.FromMinutes(finalTime));
+                    if (date.DayOfWeek == DayOfWeek.Friday)
+                    {
+                        DateTime finalDate= date.AddDays(1);
+                        estimatedTime = finalDate.ToString("dd MMM yyyy hh:mm tt");
+                    }
+                    else
+                    {
+                        estimatedTime = date.ToString("dd MMM yyyy hh:mm tt");
+                    }
+                    
+                }
 
+                return estimatedTime;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+        public DateTime AddWithinWorkingHours(DateTime start, TimeSpan offset)
+        {
+            const int hoursPerDay = 9;
+            const int startHour = 9;
+
+            // Don't start counting hours until start time is during working hours
+            if (start.TimeOfDay.TotalHours > startHour + hoursPerDay)
+                start = start.Date.AddDays(1).AddHours(startHour);
+            if (start.TimeOfDay.TotalHours < startHour)
+                start = start.Date.AddHours(startHour);
+            if (start.DayOfWeek == DayOfWeek.Friday)
+                start.AddDays(1);
+            //else if (start.DayOfWeek == DayOfWeek.Friday)
+            //    start.AddDays(1);
+
+            // Calculate how much working time already passed on the first day
+            TimeSpan firstDayOffset = start.TimeOfDay.Subtract(TimeSpan.FromHours(startHour));
+
+            // Calculate number of whole days to add
+            int wholeDays = (int)(offset.Add(firstDayOffset).TotalHours / hoursPerDay);
+
+            // How many hours off the specified offset does this many whole days consume?
+            TimeSpan wholeDaysHours = TimeSpan.FromHours(wholeDays * hoursPerDay);
+
+            // Calculate the final time of day based on the number of whole days spanned and the specified offset
+            TimeSpan remainder = offset - wholeDaysHours;
+
+            // How far into the week is the starting date?
+            int weekOffset = ((int)(start.DayOfWeek + 7) - (int)DayOfWeek.Friday) % 7;
+
+            // How many weekends are spanned?
+            int weekends = (int)((wholeDays + weekOffset) / 6);
+
+            // Calculate the final result using all the above calculated values
+            return start.AddDays(wholeDays + weekends * 1).Add(remainder);
+        }
+    }
 }

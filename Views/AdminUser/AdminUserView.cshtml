@@ -8,18 +8,14 @@
         <div class="row">
             <div class="col-md-2">
                 <ul class="nav">
-                    <li><a href="#" onclick="">Dashboard</a></li>
+                    <li><a href="#" onclick="changeDiv(3)">Dashboard</a></li>
                     <li><a href="#" onclick="AllRequestById()">All Request</a></li>
-                    <li><a href="#" onclick="">Pending To Co ordinator</a></li>
-                    <li><a href="#" onclick="">Data entry Assigned </a></li>
-                    <li><a href="#" onclick="">Complete List</a></li>
-                    <li><a href="#" onclick="">Closed List </a></li>
-                    <li><a href="#" onclick="">Merchandiser List</a></li>
-                    <li><a href="#" onclick="">Co Ordinator List</a></li>
-                    <li><a href="#" onclick="">Data Entry List</a></li>
+                    <li><a href="#" onclick="GetAdminPending(1)">Pending To Co ordinator</a></li>
+                    <li><a href="#" onclick="GetAdminPending(2)">Assign To D.E.O</a></li>
+                    <li><a href="#" onclick="GetAdminPending(8)">Closed List </a></li>
                 </ul>
             </div>
-            <div class="col-md-10" >
+            <div class="col-md-10">
                 <h3 style="text-align:center">Admin Dashboard</h3>
                 <div id="admin_dashboard">
 
@@ -27,6 +23,24 @@
             </div>
         </div>
     </div>
+    <div class="modal" id="modalTaskPreview">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Request Number: <input id="RequestCoId" type="text" style="border:none;background:none" disabled /> </h4>
+                </div>
+                <div id="modaltaskbody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 </font>
 <script type="text/javascript">
     function AllRequestById() {
@@ -54,7 +68,7 @@
             });
     }
     function AdminGetDetails(RequestId) {
-        var urlpath = '@Url.Action("GetRequestInformationById", "Tracker")';
+        var urlpath = '@Url.Action("GetRequestAdmin", "AdminUser")';
             $.ajax({
                 url: urlpath,
                 type: "Post",
@@ -64,6 +78,146 @@
                         $('#admin_dashboard').empty();
                         $('#admin_dashboard').html(data);
                     }
+                });
+    }
+    function changeDiv(status) {
+        var urlpath = '@Url.Action("ChangeDivView", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {status:status},
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $('#admin_dashboard').empty();
+                            $('#admin_dashboard').html(data);
+                        }
+                    }
+            });
+    }
+
+    function GetInformationBYRequest(requestId,reqCod,oper,revi) {
+        var urlpath = '@Url.Action("GetCoordinatorFilesDatabase", "AdminUser")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { RequestId: requestId, Reqcod: reqCod, OperationId:oper, Revision:revi,Partial:"_requestdetails_admin"},
+                async: true,
+                success: function (data) {
+                        if (data) {
+                            $('#modaltaskbody').empty();
+                            $('#modaltaskbody').html(data);
+                            $('#modalTaskPreview').show();
+                            $('#RequestCoId').val(reqCod);
+                            CommentsTable(reqCod);
+                        }
+
+                    }
+                });
+    }
+
+    function InsertComments(requestId) {
+        if ($("#commentsText").val().length < 1) {
+
+        } else {
+            var comments = $("#commentsText").val();
+            var urlpath = '@Url.Action("InsertComments", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { RequestId: requestId, Comments: comments },
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $("#commentsText").val("");
+                            CommentsTable(requestId);
+                        }
+                    }
+                });
+        }
+        
+    }
+    function CommentsTable(requestId) {
+            var urlpath = '@Url.Action("ReadAllComments", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { RequestId: requestId },
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $("#coordinatorComments").empty();
+                            for (var i = 0; i < data.length; i++) {
+                                        var newRow = $('<tr>');
+                                        var cols = "";
+                                        cols += '<td style="width:20%;color:blue">' + data[i].UserName + '</td>';
+                                        cols += '<td style="width:30%;">' + data[i].CreateTime + '</td>';
+                                        cols += '<td style="width:50%;word-break: break-word">' + data[i].ReviewMessage + '</td></tr>';
+                                newRow.append(cols);
+                                $("#coordinatorComments").append(newRow);
+                            }
+                            
+                        }
+                    }
+                });    
+    }
+
+
+    function GetAdminPending(status) {
+         var urlpath = '@Url.Action("GetAdminPending", "AdminUser")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {Status:status},
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $('#admin_dashboard').empty();
+                            $('#admin_dashboard').html(data);
+                            $('#pendigcotablelist').dataTable();
+                        }
+                    }
+            });
+    }
+
+    function AssignRequestToDataEntry(requestedId,assignto,updateSLA) {
+        var urlpath = '@Url.Action("AssignRequestDataEntry", "Tracker")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: { RequestId: requestedId, AssignTo: assignto, UpdateSLA: updateSLA },
+            async: true,
+            success: function (data) {
+                if (data) {
+                    swal({
+                        title: 'Request Number Successfully Assigned',
+                        type: 'success',
+                        closeOnCancel: true
+                    }, function () {
+                            GetAdminPending(1);
+                            $('#modalTaskPreview').modal('hide');
+                    });
+                }
+            }
+        });
+    }
+
+    function GetDataEntryUser(module) {
+        var urlpath = '@Url.Action("GetTrackerUser", "Tracker")';
+                $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { Module:module},
+                async: true,
+                success: function (data) {
+                    if (data) {
+                        $("#assignTo").empty();
+                        for (var i = 0; i < data.length; i++) {
+                            $("#assignTo").append($("<option></option>").val(data[i].UserInformationId)
+                                    .html(data[i].UserInformationName));
+                        }
+                    }
+                }
                 });
     }
 </script>

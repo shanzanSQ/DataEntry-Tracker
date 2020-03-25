@@ -1,0 +1,101 @@
+﻿@model DataEntry_Tracker.Models.RequestSupplyChain
+<style type="text/css">
+</style>
+<div id="modal_task">
+    <table class="" width="100%" border="1">
+        <tbody>
+            <tr>
+                <th width="30%">S.Request ID </th>
+                <td width="70%">@Model.SupplyChainId</td>
+            </tr>
+            <tr>
+                <th>Po Number</th>
+                <td>@Model.PoNumber</td>
+            </tr>
+            <tr>
+                <th>Sub Catagory Name</th>
+                <td>@Model.PoCatagoryName</td>
+            </tr>
+            <tr>
+                <th>Remarks</th>
+                <td>@Model.Remarks</td>
+            </tr>
+            <tr>
+                <th>Co-ordinator Name</th>
+                <td>@Model.CoordinatorName</td>
+            </tr>
+            <tr>
+                <th>Supply Chain User Name</th>
+                <td>@Model.SpUserName</td>
+            </tr>
+            <tr>
+                <th>Create Date</th>
+                <td>@DateTime.Parse(Model.CreateTime).ToString("dd MMM yyyy h:mm:ss tt")</td>
+            </tr>
+            <tr>
+                <th>OTT Date</th>
+                <td>@DateTime.Parse(Model.OttDate).ToString("dd MMM yyyy")</td>
+            </tr>
+            <tr>
+                <th>Assign Time</th>
+                <td>
+                    @if (Model.AssignTime != "")
+                    {@DateTime.Parse(Model.AssignTime).ToString("dd MMM yyyy h:mm:ss tt")}
+                </td>
+            </tr>
+            <tr>
+                <th>Entry Started</th>
+                <td>
+                    @if (Model.StartTime != "")
+                    {@DateTime.Parse(Model.StartTime).ToString("dd MMM yyyy h:mm:ss tt")}
+                </td>
+            </tr>
+            <tr>
+                <th>Entry End</th>
+                <td>
+                    @if (Model.EndTime != "")
+                    {@DateTime.Parse(Model.EndTime).ToString("dd MMM yyyy h:mm:ss tt")}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    @if (Model.fileUploadModel != null)
+    {
+        <table border="1" width="100%" style="text-align:center" id="modalfilelist">
+            <caption>Files & Instructions</caption>
+            <tr>
+                <th>
+                    File Name
+                </th>
+                <th>
+                    Action
+                </th>
+            </tr>
+            @foreach (var item in Model.fileUploadModel)
+            {
+                <tr id="@item.FileUploadId">
+                    <td>
+                        @item.FileUploadName
+                    </td>
+                    <td>
+                        @Html.ActionLink("Download", "DownloadFile", "Tracker", new { filepath = item.FileUploadPath.ToString(), filename = item.FileUploadName.ToString() }, new { @target = "_blank" })
+                    </td>
+                </tr>
+            }
+        </table>
+    }
+<div style="text-align:center">
+    <br />
+    @if (Model.Progressid == 2)
+    {
+        <button type="button" style="width:30%" class="btn btn-success btn-sm" onclick="UpdateOrCloase(@Model.SupplyChainId,3)">Start</button>
+        <button type="button" style="width:30%" class="btn btn-danger btn-sm" onclick="UpdateOrCloase(@Model.SupplyChainId,4)">Returns</button>
+    }
+    else if (Model.Progressid == 3)
+    {
+        <button type="button" style="width:30%" class="btn btn-success btn-sm" onclick="UpdateOrCloase(@Model.SupplyChainId,6)">End Request</button>
+    }
+</div>
+   
+</div>

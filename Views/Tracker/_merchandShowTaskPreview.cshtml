@@ -1,163 +1,183 @@
-﻿<table class="" width="100%" border="1">
-    <tbody>
-        <tr>
-            <th>Operation Name</th>
-            <td>@Model.BaseOperationName</td>
-        </tr>
-        <tr>
-            <th>Instruction</th>
-            @if (Model.Progress == 7)
-            {
-                <td><input type="text" value="@Model.Instruction" style="width:100%" /></td>
-            }
-            else
-            {
-                <td>@Model.Instruction</td>
-            }
-        </tr>
-        <tr>
-            <th>Create Time</th>
-            <td>@Model.CreateDate.ToString("dd MMM yyyy h:mm:ss tt")</td>
-        </tr>
-        <tr>
-            <th>Assign To</th>
-            <td>@Model.UserName</td>
-        </tr>
-        <tr>
-            <th>Assign Time</th>
-            <td>
-                @if (Model.CoUpdatedBy != "")
-                {@DateTime.Parse(Model.CoUpdatedBy).ToString("dd MMM yyyy h:mm:ss tt")}
-            </td>
-        </tr>
-        <tr>
-            <th>Entry Started</th>
-            <td>
-                @if (Model.DataEntryCreated != "")
-                {@DateTime.Parse(Model.DataEntryCreated).ToString("dd MMM yyyy h:mm:ss tt")}
-            </td>
-        </tr>
-        <tr>
-            <th>Entry End</th>
-            <td>
-                @if (Model.DataEntryUpdated != "")
-                {@DateTime.Parse(Model.DataEntryUpdated).ToString("dd MMM yyyy h:mm:ss tt")}
-            </td>
-        </tr>
-        <tr>
-            <th>Progress</th>
-            @switch (Model.Progress)
-            {
-                case 1:
-                    <td style="color:red">Pending</td>
-                    break;
-                case 2:
-                    <td style="color:red">Pending</td>
-                    break;
-                case 3:
-                    <td style="color:red">Pending</td>
-                    break;
-                case 4:
-                    <td style="color:red">Pending</td>
-                    break;
-                case 5:
-                    <td style="color:red">Data Entry In Progress</td>
-                    break;
-                case 6:
-                    <td style="color:blue">Complete </td>
-                    break;
-                case 7:
-                    <td style="color:green">Update</td>
-                    break;
-                case 8:
-                    <td style="color:green">Closed</td>
-                    break;
+﻿@model DataEntry_Tracker.Models.CommonModel
+<style type="text/css">
+    #updateTable input[type="text"] input[type="button"] input[type="file"] {
+        height: 14px;
+    }
 
-            }
-        </tr>
-    </tbody>
-</table>
-
-@if (Model.fileUploadModelsList != null)
-{
-    <table border="1" width="100%" style="text-align:center" id="modalfilelist">
-        <caption>Files & Instructions</caption>
-        <tr>
-            <th>
-                File Name
-            </th>
-            <th>
-                Instructions
-            </th>
-            <th>
-                Action
-            </th>
-            @if (Model.Progress == 7)
-            {
-                <th></th>
-            }
-        </tr>
-        @foreach (var item in Model.fileUploadModelsList)
-        {
-            <tr id="@item.FileUploadId">
-                <td>
-                    @item.FileUploadName
-                </td>
-                <td>
-                    @item.Instructions
-                </td>
-                <td>
-                    @Html.ActionLink("Download", "DownloadFile", "Tracker", new { filepath = item.FileUploadPath.ToString(), filename = item.FileUploadName.ToString() }, new { @target = "_blank" })
-                </td>
+    .form-control {
+        width: 95%;
+        margin-bottom: 2px;
+    }
+</style>
+<div id="modal_task">
+    <table class="" width="100%" border="1">
+        <tbody>
+            <tr>
+                <th>Operation Name</th>
+                <td>@Model.BaseOperationName</td>
+            </tr>
+            <tr>
+                <th>Instruction</th>
                 @if (Model.Progress == 7)
                 {
-                    <td>
-                        <input type="button" style="margin:1px" class="btn btn-danger btn-sm" onclick="DeleteFile(@item.FileUploadId)" value="X" />
-                    </td>
+                    <td><input type="text" value="@Model.Instruction" style="width:100%" /></td>
                 }
-
+                else
+                {
+                    <td>@Model.Instruction</td>
+                }
             </tr>
-        }
-    </table>
-}
-<p>Comments Section</p>
-<div id="comments_section" class="container" style="overflow-wrap:inherit; width:100%;overflow-y: scroll;height:100px;border:1px solid;margin-top:5px">
-    <table width="100%" id="commentsSection">
+            <tr>
+                <th>Create Time</th>
+                <td>@Model.CreateDate.ToString("dd MMM yyyy h:mm:ss tt")</td>
+            </tr>
+            <tr>
+                <th>Assign To</th>
+                <td>@Model.UserName</td>
+            </tr>
+            <tr>
+                <th>Assign Time</th>
+                <td>
+                    @if (Model.CoUpdatedBy != "")
+                    {@DateTime.Parse(Model.CoUpdatedBy).ToString("dd MMM yyyy h:mm:ss tt")}
+                </td>
+            </tr>
+            <tr>
+                <th>Entry Started</th>
+                <td>
+                    @if (Model.DataEntryCreated != "")
+                    {@DateTime.Parse(Model.DataEntryCreated).ToString("dd MMM yyyy h:mm:ss tt")}
+                </td>
+            </tr>
+            <tr>
+                <th>Entry End</th>
+                <td>
+                    @if (Model.DataEntryUpdated != "")
+                    {@DateTime.Parse(Model.DataEntryUpdated).ToString("dd MMM yyyy h:mm:ss tt")}
+                </td>
+            </tr>
+            <tr>
+                <th>Progress</th>
+                @switch (Model.Progress)
+                {
+                    case 1:
+                        <td style="color:red">Pending</td>
+                        break;
+                    case 2:
+                        <td style="color:red">Pending</td>
+                        break;
+                    case 3:
+                        <td style="color:red">Pending</td>
+                        break;
+                    case 4:
+                        <td style="color:red">Pending</td>
+                        break;
+                    case 5:
+                        <td style="color:red">Data Entry In Progress</td>
+                        break;
+                    case 6:
+                        <td style="color:blue">Complete </td>
+                        break;
+                    case 7:
+                        <td style="color:green">Update</td>
+                        break;
+                    case 8:
+                    <td style="color:green">Closed</td>
+                        break;
+                    case 11:
+                        <td style="color:green">D.E.O Complete</td>
+                        break;
 
+                }
+            </tr>
+        </tbody>
     </table>
 
+    @if (Model.fileUploadModelsList != null)
+    {
+        <table border="1" width="100%" style="text-align:center" id="modalfilelist">
+            <caption>Files & Instructions</caption>
+            <tr>
+                <th>
+                    File Name
+                </th>
+                <th>
+                    Instructions
+                </th>
+                <th>
+                    Action
+                </th>
+                @if (Model.Progress == 7)
+                {
+                    <th></th>
+                }
+            </tr>
+            @foreach (var item in Model.fileUploadModelsList)
+            {
+                <tr id="@item.FileUploadId">
+                    <td>
+                        @item.FileUploadName
+                    </td>
+                    <td>
+                        @item.Instructions
+                    </td>
+                    <td>
+                        @Html.ActionLink("Download", "DownloadFile", "Tracker", new { filepath = item.FileUploadPath.ToString(), filename = item.FileUploadName.ToString() }, new { @target = "_blank" })
+                    </td>
+                    @if (Model.Progress == 7)
+                    {
+                        <td>
+                            <input type="button" style="margin:1px" class="btn btn-danger btn-sm" onclick="DeleteFile(@item.FileUploadId)" value="X" />
+                        </td>
+                    }
+
+                </tr>
+            }
+        </table>
+    }
+
+    <p>Comments Section</p>
+    <div id="comments_section" class="container" style="overflow-wrap:inherit; width:100%;overflow-y: scroll;height:100px;border:1px solid;margin-top:5px">
+        <table width="100%" id="commentsSection">
+        </table>
+
+    </div>
+    @if (Model.Progress != 8)
+    {
+        <table style="text-align:center;width:80%;margin-left:10%;margin-top:2px">
+            <tr>
+                <td style="width:80%"><input type="text" style="width:100%" id="commentsText" /></td>
+                <td style="width:20%"> <input type="button" style="padding:2px" value="Comments" class="btn btn-sm btn-info" onclick="InsertComments(@Model.RequestCodId)" /></td>
+            </tr>
+        </table>
+    }
+
+    @if (Model.Progress == 7)
+    {
+        <br />
+        <div class="row">
+            <div class="col-md-12">
+                <table width="100%" id="updateTable">
+                    <tr>
+                        <td style="padding:2px"><input type="file" class="form-control" id="filenamemodalupload" multiple /></td>
+                        <td style="padding:2px"><input type="text" class="form-control" id="instructionmodalpop" placeholder="Notes" /></td>
+                        <td style="padding:2px"><input type="button" class="btn btn-sm btn-success" onclick="uploadFiles('#filenamemodalupload',@Model.BaseOperationId, @Model.RequestId, $('#instructionmodalpop').val(),@Model.RivisionNo, '#modalfilelist');" value="Upload" /></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div style="text-align:center">
+            <br />
+            <input type="button" class="btn btn-primary btn-sm" onclick="UpdateStartOrEnd(@Model.RequestCodId,1,@Model.RequestId)" value="Update" />
+        </div>
+    }
+    else if (Model.Progress == 6)
+    {
+        <div style="text-align:center">
+            <br />
+            <input type="button" class="btn btn-danger btn-sm" onclick="UpdateStartOrEnd(@Model.RequestCodId,10,@Model.RequestId)" value="Error And Return" />
+            <input type="button" class="btn btn-primary btn-sm" onclick="UpdateStartOrEnd(@Model.RequestCodId,8,@Model.RequestId)" value="Close Task" />
+        </div>
+    }
 </div>
-<table style="text-align:center;width:80%;margin-left:10%;margin-top:2px">
-    <tr>
-        <td  style="width:80%"><input type="text" style="width:100%" id="commentsText"  /></td>
-        <td  style="width:20%"> <input type="button" style="padding:2px" value="Comments" class="btn btn-sm btn-success" onclick="InsertComments(@Model.RequestCodId)" /></td>
-    </tr>
-</table>
-@if (Model.Progress == 7)
-{
-    <br />
-    <div class="row">
-        <div class="col-md-4">
-            <input type="file" class="form-control" id="filenamemodalupload" />
-        </div>
-        <div class="col-md-4">
-            <input type="text" class="form-control" id="instructionmodalpop" />
-        </div>
-        <div class="col-md-4">
-            <input type="button" class="form-control btn btn-sm btn-success" onclick="uploadFiles('#filenamemodalupload',@Model.BaseOperationId, @Model.RequestId, $('#instructionmodalpop').val(),@Model.RivisionNo, '#modalfilelist');" value="Upload" />
-        </div>
 
-    </div>
-    <div style="text-align:center">
-        <br />
-        <input type="button" class="btn btn-success btn-sm" onclick="UpdateStartOrEnd(@Model.RequestCodId,1,@Model.RequestId)" value="Update" />
-    </div>
-}
-else if (Model.Progress == 6)
-{
-    <div style="text-align:center">
-        <br />
-        <input type="button" class="btn btn-info btn-sm" onclick="UpdateStartOrEnd(@Model.RequestCodId,8,@Model.RequestId)" value="Close" />
-    </div>
-
-}

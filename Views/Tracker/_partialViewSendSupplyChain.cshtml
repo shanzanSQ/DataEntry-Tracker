@@ -1,0 +1,72 @@
+﻿@model DataEntry_Tracker.Models.CommonModel
+<style type="text/css">
+    .form-control {
+        width: 95%;
+        margin-bottom: 2px;
+    }
+
+    #rmpofilesTable tr th {
+        text-align: center
+    }
+</style>
+<link href="~/Content/bootstrap-multiselect.css" rel="stylesheet" />
+<div id="" style="text-align:center">
+    <p style="text-align:center;color:green">No Of PO : @Model.NoOfTransections</p>
+    <div id="supplyChainDiv">
+            <table width="100%" style="text-align:left">
+            <caption>Send To Supply Chain</caption>
+            <tr>
+                <td>
+                    <label for="poNumber">Enter PO Number</label>
+                    <select  id="poNumber" class="form-control"></select>
+                </td>
+                <td>
+                    <label for="pocatagory">Sub Catagory</label>
+                    <select id="pocatagory" class="form-control" multiple="multiple" onchange="subcatagoryName()" data-live-search="true">
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><p id="subcatagoryName"></p></td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="ottDate">OTT Date</label>
+                    <input type="date" id="ottDate" class="form-control" />
+                </td>
+                <td>
+                    <label for="remarks">Remarks</label>
+                    <input id="remarks" type="text" class="form-control" placeholder="add remarks for supply chain" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="addrmpofile">Add Po Files</label>
+                    <input type="file" id="addrmpofile" class="form-control" onchange="FilesToSupplyChain(@Model.RequestCodId,'#addrmpofile','#rmpofileUploadbody')" />
+                </td>
+                <td>
+                    <label for="rmposubmit">Send Request To Supply Chain</label>
+                    <input type="button" id="rmposubmit" value="Submit To Supply Chain" onclick="SubmitToSupplyChain(@Model.RequestCodId)" class="form-control btn btn-success btn-sm" />
+                </td>
+            </tr>
+        </table>
+
+        <table width="100%" id="rmpofilesTable" border="1">
+            <caption>Add RMPO files</caption>
+            <thead>
+                <tr>
+                    <th>
+                        File Name
+                    </th>
+                    <th>
+                        Action
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="rmpofileUploadbody">
+            </tbody>
+        </table>
+        <br />
+    </div>
+</div>
+<script src="~/Scripts/bootstrap-multiselect.js"></script>

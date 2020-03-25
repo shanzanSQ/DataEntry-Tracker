@@ -1,0 +1,128 @@
+﻿
+@{
+    ViewBag.Title = "SupplyUserView";
+}
+<style type="text/css">
+    .active {
+        background-color: #c4c4c4;
+    }
+
+    .sweet-alert {
+        background-color: #C3C4C5;
+    }
+</style>
+<font size="2" face="Calibri">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2">
+                <ul class="nav">
+                    <li><a href="#" onclick="AllAssignedWork(2,3)">Pending Request </a></li>
+                    <li><a href="#" onclick="AllAssignedWork(3,3)">Request In Progress</a></li>
+                    <li><a href="#" onclick="AllAssignedWork(6,3)">Completed Request</a></li>
+                    <li><a href="#" onclick="AllAssignedWork(7,3)">All Request So far</a></li>
+                </ul>
+            </div>
+            <div class="col-md-10">
+                <h3 style="text-align:center">Supply Chain <span id="spmenuid">User View </span></h3>
+                <div id="userDashboard"> </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="supplyModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close"
+                            data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="modaltaskbody" class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="remove_button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+</font>
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script type="text/javascript">
+    $('li > a').click(function() {
+        $('li').removeClass();
+        $(this).parent().addClass('active');
+        $("#spmenuid").html($(this).html());
+    });
+
+    function AllAssignedWork(progress,userType) {
+         var urlpath = '@Url.Action("GetSupplyChainRequest", "SupplyChain")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { Progress: progress,UserType: userType},
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $('#userDashboard').empty();
+                            $('#userDashboard').html(data);
+                            $('#coordinatorTable').DataTable({
+                                "order": [[3, "desc"]],
+                                "lengthMenu": [ [10, 25, 50, -1], [10, 25, 50, "All"] ]
+                            });
+                        }
+                },
+                error: function (xhr, status, error) {
+                    swal({
+                        title: 'Something Went Wrong!!',
+                        type: 'error',
+                        closeOnCancel: true
+                    });
+                }
+            });
+    }
+    function GetDetailsSupplyRequest(SupRequestId,userType) {
+        var urlpath = '@Url.Action("GetDetailsSupplyChain", "SupplyChain")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { SupRequestId: SupRequestId, UserType: userType },
+                async: true,
+                success: function (data) {
+                        if (data) {
+                            $('#modaltaskbody').empty();
+                            $('#modaltaskbody').html(data);
+                            $('#supplyModal').show();
+                           // CommentsTable(reqCod);
+                        }
+
+                    }
+                });
+    }
+    function UpdateOrCloase(requestedId,progress) {
+         var urlpath = '@Url.Action("SupplyChainUpdateTime", "SupplyChain")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: { SupplyChainID: requestedId , Progress:progress},
+            async: true,
+            success: function (data) {
+                if (data) {
+                    swal({
+                        title: 'Done',
+                        type: 'success',
+                        closeOnCancel: true
+                    }, function () {
+                        AllAssignedWork(2, 3);
+                        $('#supplyModal').modal('hide');
+                    });
+                } else {
+                    swal({
+                        title: "Plase finish the Current Job First !!!!",
+                        type: 'error',
+                        closeOnCancel: true
+                    });
+                }
+            }
+        });
+    }
+</script>

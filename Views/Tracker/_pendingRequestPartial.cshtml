@@ -1,1 +1,40 @@
-﻿
+﻿@model IEnumerable<DataEntry_Tracker.Models.CommonModel>
+<div class="box">
+    <table class="table table-striped" id="marchandTable">
+        <thead>
+            <tr>
+                <th>R.Id</th>
+                <th>Task Id</th>
+                <th>Operation Name</th>
+                <th>Unit Name</th>
+                <th>Buyer Name</th>
+                <th>Style Name </th>
+                <th>Remaining PO</th>
+                <th>Create Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{ int count = 1;}
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.RequestId</td>
+                    <td>@item.RequestCodId</td>
+                    <td>@item.BaseOperationName</td>
+                    <td>@item.UnitName</td>
+                    <td>@item.BuyerName</td>
+                    <td>@item.StyleName</td>
+                    <td>@item.NoOfTransections</td>
+                    <td>@item.CreateDate.ToString("dd MMM yyyy h:mm tt")</td>
+                    <td>
+                        <button type="button" class="btn  btn-block btn-info btn-sm" data-toggle="modal" data-target="#modalTaskPreview" onclick="CreateSupplyChainView(@item.RequestCodId,@item.NoOfTransections)">Details</button>
+                    </td>
+                </tr>
+                count++;
+            }
+        </tbody>
+    </table>
+</div>
+
+

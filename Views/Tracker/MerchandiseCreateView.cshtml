@@ -60,13 +60,18 @@
     }
 </style>
 
-<font size="2" face="Times New Roman">
+<font size="2" face="Calibri">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-2">
                 <ul class="nav">
                     <li><a href="#" onclick="changeDiv(0)">Create New Request</a></li>
-                    <li><a href="#" onclick="AllRequestById()">All Request </a></li>
+                    <li><a href="#" onclick="MerchandiserRequest(1,3)">My Pending </a></li>
+                    <li><a href="#" onclick="MerchandiserRequest(7,3)">Return Request </a></li>
+                    <li><a href="#" onclick="MerchandiserRequest(6,3)">Completed</a></li>
+                    <li><a href="#" onclick="MerchandiserRequest(1,4)">Create Supply Chain Request</a></li>
+                    <li><a href="#" onclick="GetSupplyChainProgress(0,1)">Supply Chain Request</a></li>
+                    <li><a href="#" onclick="AllRequestById()">All Data Entry Request </a></li>
                     <li><a href="#" onclick="changeDiv(1)">Add Information</a></li>
                 </ul>
             </div>
@@ -117,7 +122,7 @@
         </div>
     </div>
 
-    <div class="modal" id="modalTaskPreview" >
+    <div class="modal" id="modalTaskPreview">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -136,64 +141,9 @@
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 </font>
-
-
-
-@*<div class="chat-popup"  id="myForm">
-        <button type="button" class="form-control btn btn-info btn-sm cancel" id="cancelButton" onclick="closeForm()">Co- Ordinator</button>
-
-        <div class="form-container">
-            <div class="messagediv" id="merchandMessage">
-
-            </div>
-            <table style="margin-top:2px" width="100%">
-                <tr>
-                    <td width="80%">
-                        <input type="text"  id="enterMessage" placeholder="" />
-                    </td>
-                    <td width="20%">
-                        <button type="button"  id="sendTosender"><span class="glyphicon glyphicon-send"></span></button>
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </div>
-    <button class="open-button btn btn-success btn-sm" id="chatbutton" onclick="openForm()">Chat</button>*@
-
-<div class="online-popup" id="chatform">
-    <button type="button" class="chatbutton cancel" id="cancelChatbutton" onclick="closeForm()">See Users</button>
-
-    <div class="onlinechatcontainer">
-        <ul id="usersUl">
-        </ul>
-    </div>
-</div>
-<button class="open-button btn btn-success btn-sm" id="openchatbutton" onclick="openForm()" style="display:none">Online</button>
-
-<div id="chat-popupuser">
-    <input type="button" class="form-control btn btn-info btn-sm cancel" id="removepopup" onclick="removeChatPopUp()" />
-    <div class="messagediv" id="messageshow"></div>
-    <input type="hidden" id="recevierId" value="" />
-    <table style="margin-top:5px" width="100%">
-        <tr>
-            <td width="80%"><input type="text" id="enterMessage" placeholder="" /></td>
-            <td width="20%"><button class="btn btn-sm btn-info" type="button" id="sendmessageuser"><span class="glyphicon glyphicon-send"></span></button></td>
-        </tr>
-    </table>
-</div>
-
 <script src="~/Scripts/jquery-3.4.1.min.js"></script>
 <script type="text/javascript">
     var t;
-    //$("#sendTosender").click(function () {
-    //    if ($("#enterMessage").val().length<1) {
-    //         $("#enterMessage").attr({ "placeholder": "enter message" });
-    //    } else {
-    //         var message = $("#enterMessage").val();
-    //        saveChatMessage(2, message, "#merchandMessage");
-    //        $("#enterMessage").val("");
-    //    }
-    //});
     $("#sendmessageuser").click(function () {
         if ($("#enterMessage").val().length<1) {
              $("#enterMessage").attr({ "placeholder": "enter message" });
@@ -203,7 +153,6 @@
             $("#enterMessage").val("");
         }
     });
-
     function submitTracker(requestId) {
         if ($("#baseOperations").val() == "0") {
             $('#baseOperations').css({ "border-color": "#FF0000" });
@@ -211,13 +160,15 @@
             $('#selectrevision').css({ "border-color": "#FF0000" });
         } else if (!$.isNumeric($("#noofTransections").val())) {
             $('#noofTransections').css({ "border-color": "#FF0000" });
-        } else {
+        }else if ($("#priority").val()=="0") {
+            $('#priority').css({ "border-color": "#FF0000" });
+        }else {
             var instructions = $("#modalInstruction").val();
             var oprationId = $("#baseOperations").val();
             if ($('#selectrevision').val() == 1) {
                oprationId = parseInt($('#baseOperations').val());
             } else {
-               oprationId= parseInt($('#baseOperations').val()) + 9;
+               oprationId= parseInt($('#baseOperations').val()) + 11;
              }
              var priority = $("#priority").val();
              var noOfTransections = $("#noofTransections").val();
@@ -235,7 +186,7 @@
                                         closeOnCancel: true
                                     },
                             function () {
-                                    GetDetailsInformationBYRequestId(requestId)
+                                    GetDetailsInformationBYRequestId(requestId);
                                     });
                             } else {
                                 Swal.fire(
@@ -248,16 +199,6 @@
                     });
         }
     }
-
-    function openForm() {
-        document.getElementById("chatform").style.display = "block";
-         $("#openchatbutton").hide();
-         $("#cancelChatbutton").show();
-        allTrackerUsers(15);
-        t = setInterval(function () { allTrackerUsers(15);}, 1000);
-
-    }
-
     function allTrackerUsers(module) {
         var urlpath = '@Url.Action("GetTrackerUser", "Tracker")';
                 $.ajax({
@@ -280,24 +221,6 @@
                 }
                 });
     }
-    function closeForm() {
-        document.getElementById("chatform").style.display = "none";
-        $("#openchatbutton").show();
-        $("#cancelChatbutton").hide();
-        clearInterval(t);
-    }
-    function openChatPopUp(userId, userName) {
-        clearInterval(t);
-        $("#chat-popupuser").show();
-        $("#removepopup").val(userName);
-        $("#recevierId").val(userId);
-        getChattingMessage(userId, "#messageshow");
-        t = setInterval(function () { getChattingMessage(userId, "#messageshow");}, 1000);
-    }
-    function removeChatPopUp() {
-        $("#chat-popupuser").hide();
-        clearInterval(t);
-    }
     function saveChatMessage(sendto, message, messagediv) {
         var urlpath = '@Url.Action("SaveChatMessageToDatabase", "Tracker")';
         $.ajax({
@@ -313,7 +236,7 @@
         });
     }
     function getChattingMessage(sendto, messageDiv) {
-        allTrackerUsers(15);
+        allTrackerUsers(2);
         var urlpath = '@Url.Action("GetAllChattingMessage", "Tracker")';
         $.ajax({
             url: urlpath,
@@ -336,24 +259,7 @@
             }
         });
     }
-
-
-
-    //function openForm() {
-    //    document.getElementById("myForm").style.display = "block";
-    //    $("#chatbutton").hide();
-    //    $("#cancelButton").show();
-    //    getChattingMessage(2, "#merchandMessage");
-    //    t = setInterval(function () { getChattingMessage(2, "#merchandMessage");}, 1000);
-    //}
-
-    //function closeForm() {
-    //    document.getElementById("myForm").style.display = "none";
-    //    $("#chatbutton").show();
-    //    $("#cancelButton").hide();
-    //     clearInterval(t);
-    //}
-     function changeDiv(status) {
+    function changeDiv(status) {
         var urlpath = '@Url.Action("ChangeDivView", "Tracker")';
             $.ajax({
                 url: urlpath,
@@ -368,7 +274,6 @@
                     }
             });
     }
-
     function AllRequestById() {
          $("#loadMe").modal({
               backdrop: "static", //remove ability to close modal with click
@@ -400,7 +305,6 @@
                 }
             });
     }
-
     function showAllUploadedFiles(requestId,status) {
          var urlpath = '@Url.Action("GetFilesFromDatabase", "Tracker")';
             $.ajax({
@@ -452,7 +356,6 @@
         }
     });
     }
-
     function LoadBuyer() {
         var urlpath = '@Url.Action("GetBuyerFromDataBase", "Tracker")';
             $.ajax({
@@ -472,10 +375,48 @@
                     }
                 });
     }
+    function GetInformationBYRequest(requestId,reqCod,oper,revi) {
+        var urlpath = '@Url.Action("GetCoordinatorFilesDatabase", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { RequestId: requestId, Reqcod: reqCod, OperationId:oper, Revision:revi,Partial:"_merchandShowTaskPreview"},
+                async: true,
+                success: function (data) {
+                        if (data) {
+                            $('#modaltaskbody').empty();
+                            $('#modaltaskbody').html(data);
+                            $('#modalTaskPreview').show();
+                            $('#RequestCoId').val(reqCod);
+                            CommentsTable(reqCod);
+                        }
 
-
-        
-
+                    }
+                });
+    }
+    function MerchandiserRequest(status, dataco) {
+        var urlpath = '@Url.Action("GetPendingRequest", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { Pending: status, DataOrCo: dataco },
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $('#genarate_dashboard').empty();
+                            $('#genarate_dashboard').html(data);
+                            $('#marchandTable').DataTable();
+                        }
+                },
+                error: function () {
+                    swal({
+                        title: 'Something Went Wrong!!',
+                        type: 'error',
+                        closeOnCancel: true
+                    });
+                }
+            });
+    }
     function uploadFiles(upfile,operation,request,instruction,rivision,showtable) {
         var fileData = new FormData();
         var fileUpload = $(upfile).prop('files');
@@ -497,7 +438,7 @@
             contentType: false,
             data: fileData  ,
             success: function (result) {
-                        //$("#loadMe").modal("hide");
+                        $("#loadMe").modal("hide");
                         swal({
                                 title: 'File Uploaded Successfully',
                                 type: 'success',
@@ -509,7 +450,7 @@
                                     cols += '<td>' + result[i].OperationName + '</td>';
                                     cols += '<td>' + result[i].FileUploadName + '</td>';
                                     cols += '<td>'+result[i].Instructions+'</td>';
-                                    cols += '<td><input type="button" style="margin:2px" class="btn btn-danger btn-sm" onclick="DeleteFile('+result[i].FileUploadId+')"   value="X"></td></tr>';
+                                    cols += '<td><input type="button" style="margin:2px" class="btn btn-danger btn-sm" onclick="DeleteFile('+result[i].FileUploadId+',1)"   value="X"></td></tr>';
                                     newRow.append(cols);
                                     $(showtable).append(newRow);
                                 }
@@ -522,21 +463,20 @@
                     }
                 });
     }
-    function GetDetailsInformationBYRequestId(RequestId) {
+    function GetDetailsInformationBYRequestId(requestId) {
         var urlpath = '@Url.Action("GetRequestInformationById", "Tracker")';
             $.ajax({
                 url: urlpath,
                 type: "Post",
-                data: { RequestId: RequestId },
+                data: { RequestId: requestId },
                     async: true,
                     success: function(data) {
                         $('#genarate_dashboard').empty();
                         $('#genarate_dashboard').html(data);
-                        
+
                     }
                 });
     }
-
     function InsertComments(requestId) {
         if ($("#commentsText").val().length < 1) {
 
@@ -556,7 +496,7 @@
                     }
                 });
         }
-        
+
     }
     function CommentsTable(requestId) {
             var urlpath = '@Url.Action("ReadAllComments", "Tracker")';
@@ -577,11 +517,279 @@
                                 newRow.append(cols);
                                 $("#commentsSection").append(newRow);
                             }
-                            
+
                         }
                     }
-                });    
+                });
     }
+    function DeleteFile(fileuploadId,tname) {
+         var urlpath = '@Url.Action("DeleteFiles", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { FileuploadId: fileuploadId, TableName: tname },
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $("tr#" + fileuploadId + "").remove();
+                        }
+                    }
+                });
+    }
+    function UpdateStartOrEnd(requestedId,progress,masterID) {
+        var urlpath = '@Url.Action("DataEntryUpdateTime", "Tracker")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: { RequestId: requestedId , Progress:progress},
+            async: true,
+            success: function (data) {
+                if (data) {
+                    swal({
+                        title: 'Done',
+                        type: 'success',
+                        closeOnCancel: true
+                    }, function () {
+                        GetDetailsInformationBYRequestId(masterID);
+                        $('#modalTaskPreview').modal('hide');
+                    });
+                }
+            }
+        });
+    }
+
+    //Supply Chain Tracker Javascript funtion
+    function CreateSupplyChainView(requestId,not) {
+        var urlpath = '@Url.Action("CreateSupplyChain", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { RequestId: requestId, NumberTrans: not,Partial: "_partialViewSendSupplyChain" },
+                async: true,
+                success: function (data) {
+                        if (data) {
+                            $('#modaltaskbody').empty();
+                            $('#modaltaskbody').html(data);
+                            $('#modalTaskPreview').show();
+                            $('#RequestCoId').val(requestId);
+                            LoadPoCatagory();
+                            LoadPOBYREquest(requestId);
+                        }
+
+                    }
+                });
+    }
+    function LoadPoCatagory() {
+        var urlpath = '@Url.Action("LoadPoCatagory", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {},
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                           $('#pocatagory').empty();
+                            for (var i = 0; i < data.length; i++) {
+                                $("#pocatagory").append($("<option></option>").val(data[i].PoCatagoryId)
+                                    .html(data[i].PoCatagoryName));
+                            }
+                            $('#pocatagory').multiselect({
+                                includeSelectAllOption: true,
+                                maxHeight: 200,
+                                buttonWidth: '100%',
+                                dropUp: true});
+                        }
+                    }
+                });
+    }
+    function LoadPOBYREquest(requestID) {
+        var urlpath = '@Url.Action("LOPoNameBYRequest", "SupplyChain")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: {RequestID:requestID},
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                           $('#poNumber').empty();
+                            for (var i = 0; i < data.length; i++) {
+                                $("#poNumber").append($("<option></option>").val(data[i].PoCatagoryId)
+                                    .html(data[i].PoCatagoryName));
+                            }
+                        }
+                    }
+                });
+    }
+    function FilesToSupplyChain(requestCodId,fileid,fileTable) {
+        var fileData = new FormData();
+        var fileUpload = $(fileid).prop('files');
+            if (fileUpload.length>0) {
+                 for (var i = 0; i < fileUpload.length; i++) {
+                     fileData.append(fileUpload[i].name, fileUpload[i]);
+                 }
+        }
+        fileData.append('requestId', requestCodId);
+
+        var urlpath = '@Url.Action("RmpoFileUpload", "Tracker")';
+        $.ajax({
+            url: urlpath,//URL to upload files
+            type: "post", //as we will be posting files and other method POST is used
+            processData: false, //remember to set processData and ContentType to false, otherwise you may get an error
+            contentType: false,
+            data: fileData  ,
+            success: function (result) {
+                        swal({
+                                title: 'File Uploaded Successfully',
+                                type: 'success',
+                                closeOnCancel: true
+                        }, function () {
+                                for (var i = 0; i < result.length; i++) {
+                                    var newRow = $('<tr id="'+result[i].FileUploadId+'">');
+                                    var cols = "";
+                                    cols += '<td>' + result[i].FileUploadName + '</td>';
+                                    cols += '<td><input type="button" style="margin:2px" class="btn btn-danger btn-sm" onclick="DeleteFile('+result[i].FileUploadId+',2)"   value="X"></td></tr>';
+                                    newRow.append(cols);
+                                    $(fileTable).append(newRow);
+                                }
+                                $(fileid).val('');
+                        });
+                    },
+                    error: function (err) {
+                        alert(err.responseText);
+                    }
+                });
+    }
+    function SubmitToSupplyChain(requestCoId) {
+        
+        if ($("#poNumber").val()=="0") {
+            $('#poNumber').css({ "border-color": "#FF0000" });
+        }
+        else if ($("#pocatagory").val().toString() == "") {
+            swal({
+                title: 'Error',
+                text: "Please Select Sub Catagory",
+                type: 'error',
+            });
+        }
+        else if ($("#ottDate").val().length < 1) {
+            $('#ottDate').css({ "border-color": "#FF0000" });
+        } else {
+             
+             swal({
+                title: 'Are you sure?',
+                text: "This RMPO Will Send To Supply Chain",
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes'
+             }, function () {
+                 saveSupplyRequest(requestCoId);
+            });
+        }
+    }
+    function saveSupplyRequest(requestCoId) {
+        var poCatagory = $("#pocatagory").val().toString();
+        var ottdate = $("#ottDate").val();
+        var remarks = $("#remarks").val();
+        var Ponumber = $("#poNumber").val();
+                var urlpath = '@Url.Action("SubmitToSupplyChain", "Tracker")';
+                    $.ajax({
+                        url: urlpath,
+                        type: "Post",
+                        data: { RequestId: requestCoId, Remarks: remarks, CatagoryId: poCatagory, OttDate: ottdate, PoNumber: Ponumber },
+                        async: true,
+                        success: function (data) {
+                                if (data) {
+                                        GetSupplyChainProgress(0, 1);
+                                        $('#modalTaskPreview').modal('hide');
+                                } else {
+                                    Swal.fire(
+                                        'Something went Wrong please Submit Again!',
+                                        'You clicked the button!',
+                                        'error'
+                                    );
+                                }
+                            }
+                        });
+    }
+    function GetSupplyChainProgress(progress,userType) {
+         var urlpath = '@Url.Action("GetSupplyChainRequest", "SupplyChain")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { Progress: progress, UserType: userType },
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $('#genarate_dashboard').empty();
+                            $('#genarate_dashboard').html(data);
+                            $('#supplychainTable').DataTable({
+                                "order": [[3, "desc"]],
+                                "lengthMenu": [ [10, 25, 50, -1], [10, 25, 50, "All"] ]
+                            });
+                        }
+                },
+                error: function (xhr, status, error) {
+                    swal({
+                        title: 'Something Went Wrong!!',
+                        type: 'error',
+                        closeOnCancel: true
+                    });
+                }
+            });
+    }
+    function GetDetailsSupplyRequest(SupRequestId,userType) {
+        var urlpath = '@Url.Action("GetDetailsSupplyChain", "SupplyChain")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { SupRequestId: SupRequestId, UserType: userType },
+                async: true,
+                success: function (data) {
+                        if (data) {
+                            $('#modaltaskbody').empty();
+                            $('#modaltaskbody').html(data);
+                            $('#modalTaskPreview').show();
+                            $('#RequestCoId').val(SupRequestId);
+                        }
+                    }
+                });
+    }
+    function UpdateOrCloase(requestedId,progress) {
+        var urlpath = '@Url.Action("SupplyChainUpdateTime", "SupplyChain")';
+        $.ajax({
+            url: urlpath,
+            type: "Post",
+            data: { SupplyChainID: requestedId , Progress:progress},
+            async: true,
+            success: function (data) {
+                if (data) {
+                    swal({
+                        title: 'Done',
+                        type: 'success',
+                        closeOnCancel: true
+                    }, function () {
+                            GetSupplyChainProgress(0, 1);
+                            $('#modalTaskPreview').modal('hide');
+                    });
+                } else {
+                    swal({
+                        title: "Plase finish the Current Job First !!!!",
+                        type: 'error',
+                        closeOnCancel: true
+                    });
+                }
+            }
+        });
+    }
+    function subcatagoryName() {
+        var brands = $('#pocatagory option:selected');
+        var selected = [];
+        $(brands).each(function (index, brand) {
+            selected.push([$(this).html()]+" , ");
+        });
+        $('#subcatagoryName').html(selected);
+    }
+
 
 </script>
 

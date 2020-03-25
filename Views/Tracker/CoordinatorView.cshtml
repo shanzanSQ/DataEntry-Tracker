@@ -3,23 +3,34 @@
     ViewBag.Title = "CoordinatorView";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<style type="text/css">
+    .active{
+        background-color:#f1f1f1;
+    }
+</style>
 <link href="~/Content/coordinatorstyle.css" rel="stylesheet" />
-<font size="2" face="Times New Roman">
+<font size="2" face="Calibri">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-2">
                 <ul class="nav">
-                    <li><a href="#" onclick="changeDiv(3)">Dashboard</a></li>
+                    <li class="active"><a href="#" onclick="changeDiv(3)">Dashboard</a></li>
                     <li><a href="#" onclick="CoodinatorRequest(1,1)">Pending Request</a></li>
                     <li><a href="#" onclick="CoodinatorRequest(2,1)">Data entry Pending </a></li>
+                    <li><a href="#" onclick="CoodinatorRequest(7,1)">Return To Merchandiser</a></li>
+                    <li><a href="#" onclick="CoodinatorRequest(9,1)">Return For Update </a></li>
                     <li><a href="#" onclick="CoodinatorRequest(3,1)">Processing Request </a></li>
-                    <li><a href="#" onclick="CoodinatorRequest(6,1)">Complete Request </a></li>
+                    <li><a href="#" onclick="CoodinatorRequest(4,1)">Paused Request </a></li>
+                    <li><a href="#" onclick="CoodinatorRequest(5,1)">Resume Request </a></li>
+                    <li><a href="#" onclick="CoodinatorRequest(10,1)">Error Returned </a></li>
+                    <li><a href="#" onclick="CoodinatorRequest(11,1)">QC Check</a></li>
+                    <li><a href="#" onclick="CoodinatorRequest(6,1)">Completed Request </a></li>
                     <li><a href="#" onclick="CoodinatorRequest(8,1)">Closed Request </a></li>
                 </ul>
             </div>
             <div class="col-md-10">
-                <h3 style="text-align:center">Co-Ordinator View</h3>
-                <div id="coordinatorDashboard"> </div>
+                <h3 style="text-align: center ">Co-Ordinator View</h3>
+                <div id="coordinatorDashboard" > </div>
             </div>
         </div>
     </div>
@@ -68,7 +79,20 @@
 </font>
 <script src="~/Scripts/jquery-3.4.1.min.js"></script>
 <script type="text/javascript">
-    var t, interval;
+    var interval = 0;
+    changeDiv(3);
+    //interval = setInterval(function () { changeDiv(3);}, 1000);
+    //$(function() {
+    //  $( 'ul.nav li' ).on( 'click', function() {
+    //        $( this ).parent().find( 'li.active' ).removeClass( 'active' );
+    //        $( this ).addClass( 'active' );
+    //  });
+    //});
+
+    $('li > a').click(function() {
+        $('li').removeClass();
+        $(this).parent().addClass('active');
+    });
 
     $("#sendmessageuser").click(function () {
         if ($("#enterMessage").val().length<1) {
@@ -91,10 +115,10 @@
                         if (data) {
                             $('#coordinatorDashboard').empty();
                             $('#coordinatorDashboard').html(data);
-                            //$('#pendigcotablelist').DataTable();
-                             $('#pendigcotablelist').DataTable( {
-                                         "order": [[ 0, "desc" ]]
-                             });
+                            $('#pendigcotablelist').DataTable();
+                             //$('#pendigcotablelist').DataTable( {
+                             //            "order": [[ 0, "desc" ]]
+                             //});
                         }
                         
                 },
@@ -107,27 +131,11 @@
                 }
             });
     }
-
-         @*var urlpath = '@Url.Action("GetPendingRequest", "Tracker")';
-            $.ajax({
-                url: urlpath,
-                type: "Post",
-                data: {  },
-                async: true,
-                    success: function(data) {
-                        if (data) {
-                            $('#coordinatorDashboard').empty();
-                            $('#coordinatorDashboard').html(data);
-                           $("#pendigcotablelist").DataTable();
-                           // $("#requestCoordinatiorTable").DataTable();
-                        }
-                    }
-            });*@
     function openForm() {
         document.getElementById("chatform").style.display = "block";
          $("#openchatbutton").hide();
          $("#cancelChatbutton").show();
-         allTrackerUsers(16);
+         allTrackerUsers(1);
     }
     function GetDataEntryUser(module) {
         var urlpath = '@Url.Action("GetTrackerUser", "Tracker")';
@@ -203,7 +211,7 @@
         });
     }
     function getChattingMessage(sendto, messageDiv) {
-        allTrackerUsers(16);
+        allTrackerUsers(1);
         var urlpath = '@Url.Action("GetAllChattingMessage", "Tracker")';
         $.ajax({
             url: urlpath,
@@ -227,12 +235,12 @@
         });
     }
 
-    function AssignRequestToDataEntry(requestedId,assignto) {
+    function AssignRequestToDataEntry(requestedId,assignto,updateSLA) {
         var urlpath = '@Url.Action("AssignRequestDataEntry", "Tracker")';
         $.ajax({
             url: urlpath,
             type: "Post",
-            data: { RequestId: requestedId , AssignTo:assignto},
+            data: { RequestId: requestedId, AssignTo: assignto, UpdateSLA: updateSLA },
             async: true,
             success: function (data) {
                 if (data) {
@@ -283,6 +291,7 @@
                             $('#modalbody').empty();
                             $('#modalbody').html(data);
                             $('#RequestCoId').val(reqCod);
+                            CommentsTable(reqCod);
                         
                         }
                         $('#modal_preview').show();

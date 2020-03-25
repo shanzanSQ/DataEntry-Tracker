@@ -41,6 +41,17 @@ namespace DataEntry_Tracker.Controllers
             return Json(comolList, JsonRequestBehavior.AllowGet);
         }
         [HttpPost]
+        public ActionResult LoadPoCatagory()
+        {
+            if (Session["TrackerUserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+            int userid = Convert.ToInt32(Session["TrackerUserId"]);
+            List<LoadPoCatagory> comolList = trackerDAL.LoadPoFromDataBase(userid);
+            return Json(comolList, JsonRequestBehavior.AllowGet);
+        }
+        [HttpPost]
         public ActionResult GetAllBaseOperationsDatabase()
         {
             if (Session["TrackerUserId"] == null)
@@ -112,6 +123,20 @@ namespace DataEntry_Tracker.Controllers
             return PartialView(Partial, comolList);
         }
 
+        public ActionResult CreateSupplyChain(int RequestId, int NumberTrans,string Partial)
+        {
+            if (Session["TrackerUserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+            int userid = Convert.ToInt32(Session["TrackerUserId"]);
+
+            CommonModel comolList = new CommonModel();
+            comolList.RequestCodId = RequestId;
+            comolList.NoOfTransections = NumberTrans;
+            return PartialView(Partial, comolList);
+        }
+
 
         public ActionResult CreateMarchandiseRequest()
         {
@@ -162,14 +187,14 @@ namespace DataEntry_Tracker.Controllers
         }
 
         [HttpPost]
-        public ActionResult DeleteFiles(int FileuploadId,string FileuploadPath)
+        public ActionResult DeleteFiles(int FileuploadId,int TableName)
         {
             if (Session["TrackerUserId"] == null)
             {
                 return RedirectToAction("Index", "Account");
             }
             int userID = Convert.ToInt32(Session["TrackerUserId"].ToString());
-            string filepath = trackerDAL.DeleteFile(FileuploadId,userID);
+            string filepath = trackerDAL.DeleteFile(FileuploadId,userID,TableName);
             bool result = false;
                     try
                     {
@@ -223,10 +248,17 @@ namespace DataEntry_Tracker.Controllers
             if (DataOrCo == 1)
             {
                 return PartialView("_coordinatorAllRequestPartial", commonModels);
+            }else if (DataOrCo == 3)
+            {
+                return PartialView("_merchandiserPartialRequest", commonModels);
             }
-            else 
+            else if(DataOrCo==2)
             {
                 return PartialView("_dataEntryPartialViewRequest", commonModels);
+            }
+            else
+            {
+                return PartialView("_pendingRequestPartial", commonModels);
             }
         }
         public ActionResult GetTrackerUser(int Module)
@@ -269,7 +301,19 @@ namespace DataEntry_Tracker.Controllers
         }
 
         [HttpPost]
-        public ActionResult AssignRequestDataEntry(int RequestId,int AssignTo)
+        public ActionResult SubmitToSupplyChain(int RequestId, string Remarks, string CatagoryId,string OttDate,int PoNumber)
+        {
+            if (Session["TrackerUserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+            int userid = Convert.ToInt32(Session["TrackerUserId"]);
+            return Json(trackerDAL.SubmitTOSupplyChain(RequestId,Remarks,CatagoryId,OttDate,userid,PoNumber), JsonRequestBehavior.AllowGet);
+        }
+
+
+        [HttpPost]
+        public ActionResult AssignRequestDataEntry(int RequestId,int AssignTo,int UpdateSLA)
         {
             if (Session["TrackerUserId"] == null)
             {
@@ -278,11 +322,11 @@ namespace DataEntry_Tracker.Controllers
             int userid = Convert.ToInt32(Session["TrackerUserId"]);
             if (AssignTo==0)
             {
-                return Json(trackerDAL.AssignToDataEntryOperator(RequestId, userid, userid), JsonRequestBehavior.AllowGet);
+                return Json(trackerDAL.AssignToDataEntryOperator(RequestId, userid, userid,UpdateSLA), JsonRequestBehavior.AllowGet);
             }
             else
             {
-                return Json(trackerDAL.AssignToDataEntryOperator(RequestId, userid, AssignTo), JsonRequestBehavior.AllowGet);
+                return Json(trackerDAL.AssignToDataEntryOperator(RequestId, userid, AssignTo,UpdateSLA), JsonRequestBehavior.AllowGet);
             }
             
         }
@@ -298,7 +342,7 @@ namespace DataEntry_Tracker.Controllers
             ResultResponse result = new ResultResponse();
             if(Progress==3 || Progress == 5)
             {
-                if (trackerDAL.CheckDataEntryEngagged(userid) == 0)
+                if (trackerDAL.CheckDataEntryEngagged(userid,1) == 0)
                 {
                     return Json(trackerDAL.DataEntryUpdateTime(RequestId, userid, Progress), JsonRequestBehavior.AllowGet);
                 }
@@ -358,7 +402,39 @@ namespace DataEntry_Tracker.Controllers
             }
             return Json(fileuploadList,JsonRequestBehavior.AllowGet);
         }
+        public ActionResult RmpoFileUpload()
+        {
+            if (Session["TrackerUserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
 
+            int userID = Convert.ToInt32(Session["TrackerUserId"].ToString());
+            List<FileUploadModel> fileuploadList = new List<FileUploadModel>();
+            if (Request.Files.Count > 0)
+            {
+                var files = Request.Files;
+                var requestId = Convert.ToInt32(Request.Form["requestId"]);
+                foreach (string str in files)
+                {
+                    HttpPostedFileBase file = Request.Files[str] as HttpPostedFileBase;
+                    //Checking file is available to save.  
+                    if (file != null)
+                    {
+                        var currentmilse = DateTime.Now.Ticks;
+                        var InputFileName = Path.GetFileNameWithoutExtension(file.FileName);
+                        var InputFileExtention = Path.GetExtension(file.FileName);
+                        var FullFileWithext = InputFileName + currentmilse + InputFileExtention;
+                        var ServerSavePath = Path.Combine(Server.MapPath("~/Uploads/") + FullFileWithext);
+                        //Save file to server folder  
+                        file.SaveAs(ServerSavePath);
+                        FileUploadModel fileUploadModel = trackerDAL.RmpoFileUploadToDatabase(requestId, file.FileName.ToString(), ServerSavePath,userID);
+                        fileuploadList.Add(fileUploadModel);
+                    }
+                }
+            }
+            return Json(fileuploadList, JsonRequestBehavior.AllowGet);
+        }
         public ActionResult ChangeDivView(int status)
         {
             if (Session["TrackerUserId"] == null)
@@ -427,6 +503,16 @@ namespace DataEntry_Tracker.Controllers
             }
             int userid = Convert.ToInt32(Session["TrackerUserId"]);
             return Json(trackerDAL.GetAllComments(RequestId), JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetEstimatedTime(int OperationId, int Priority, int NoOfTransections)
+        {
+            if (Session["TrackerUserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+            int userid = Convert.ToInt32(Session["TrackerUserId"]);
+            return Json(trackerDAL.GetEstimatedTime(userid,OperationId,Priority,NoOfTransections), JsonRequestBehavior.AllowGet);
         }
     }
 }

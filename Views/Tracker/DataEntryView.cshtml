@@ -3,9 +3,13 @@
     ViewBag.Title = "DataEntryView";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
+    <style type="text/css">
+        .active {
+            background-color: #f1f1f1;
+        }
+    </style>
 <link href="~/Content/coordinatorstyle.css" rel="stylesheet" />
-<font size="2" face="Times New Roman">
+<font size="2" face="Calibri">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-2">
@@ -14,12 +18,13 @@
                     <li><a href="#" onclick="DataEntryRequest(3,2)">Processing Request </a></li>
                     <li><a href="#" onclick="DataEntryRequest(4,2)">All Paused Request </a></li>
                     <li><a href="#" onclick="DataEntryRequest(5,2)">All Resume Request </a></li>
+                    <li><a href="#" onclick="DataEntryRequest(11,2)">Send For QC Check</a></li>
                     <li><a href="#" onclick="DataEntryRequest(6,2)">All Complete Request </a></li>
                     <li><a href="#" onclick="DataEntryRequest(8,2)">All Closed Request </a></li>
                 </ul>
             </div>
             <div class="col-md-10">
-                <h3 style="text-align:center">Data Entry View</h3>
+                <h3 style="text-align:center" id="">Data Entry <span id="dataui">User View </span> View</h3>
                 <div id="dataentryDashboard"> </div>
             </div>
         </div>
@@ -69,6 +74,11 @@
 <script src="~/Scripts/jquery-3.4.1.min.js"></script>
 <script type="text/javascript">
     var t;
+    $('li > a').click(function() {
+        $('li').removeClass();
+        $(this).parent().addClass('active');
+        $("#dataui").html($(this).html());
+    });
 
     $("#sendmessageuser").click(function () {
         if ($("#enterMessage").val().length<1) {
@@ -126,7 +136,7 @@
         document.getElementById("chatform").style.display = "block";
          $("#openchatbutton").hide();
          $("#cancelChatbutton").show();
-         allTrackerUsers(15);
+         allTrackerUsers(2);
 
     }
 
@@ -184,7 +194,7 @@
         });
     }
     function getChattingMessage(sendto, messageDiv) {
-        allTrackerUsers(15);
+        allTrackerUsers(2);
         var urlpath = '@Url.Action("GetAllChattingMessage", "Tracker")';
         $.ajax({
             url: urlpath,
@@ -236,7 +246,6 @@
         });
     }
 
-
     function GetDetailsInformationBYRequestId(requestId,reqCod,oper,revi) {
         var urlpath = '@Url.Action("GetCoordinatorFilesDatabase", "Tracker")';
             $.ajax({
@@ -255,7 +264,65 @@
                     }
                 });
     }
+    function DeleteFile(fileuploadId,tname) {
+         var urlpath = '@Url.Action("DeleteFiles", "Tracker")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { FileuploadId: fileuploadId, TableName: tname },
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $("tr#" + fileuploadId + "").remove();
+                        }
+                    }
+                });
+    }
+    function uploadFiles(upfile,operation,request,instruction,rivision,showtable) {
+        var fileData = new FormData();
+        var fileUpload = $(upfile).prop('files');
+            if (fileUpload.length>0) {
+                 for (var i = 0; i < fileUpload.length; i++) {
+                     fileData.append(fileUpload[i].name, fileUpload[i]);
+                 }
+        }
+        fileData.append('formdataId', operation);
+        fileData.append('requestId', request);
+        fileData.append('instructions', instruction);
+        fileData.append('rivisiono', rivision);
 
+        var urlpath = '@Url.Action("UploadFiles", "Tracker")';
+        $.ajax({
+            url: urlpath,//URL to upload files
+            type: "post", //as we will be posting files and other method POST is used
+            processData: false, //remember to set processData and ContentType to false, otherwise you may get an error
+            contentType: false,
+            data: fileData  ,
+            success: function (result) {
+                        swal({
+                                title: 'File Uploaded Successfully',
+                                type: 'success',
+                                closeOnCancel: true
+                        }, function () {
+                                for (var i = 0; i < result.length; i++) {
+                                    var newRow = $('<tr id="'+result[i].FileUploadId+'">');
+                                    var cols = "";
+                                    cols += '<td>' + result[i].OperationName + '</td>';
+                                    cols += '<td>' + result[i].FileUploadName + '</td>';
+                                    cols += '<td>'+result[i].Instructions+'</td>';
+                                    cols += '<td><input type="button" style="margin:2px" class="btn btn-danger btn-sm" onclick="DeleteFile('+result[i].FileUploadId+',1)"   value="X"></td></tr>';
+                                    newRow.append(cols);
+                                    $(showtable).append(newRow);
+                                }
+                                $(upfile).val('');
+                                $(instruction).val('');
+                        });
+                    },
+                    error: function (err) {
+                        alert(err.responseText);
+                    }
+                });
+    }
 
      function InsertComments(requestId) {
         if ($("#commentsText").val().length < 1) {
@@ -301,6 +368,73 @@
                         }
                     }
                 });    
+    }
+     function AddPO(nooftrans) {
+         $("#addPOdiv").hide();
+         $("#insertPO").show();
+        for (var i = 1; i <=nooftrans;i++) {
+              var newRow = $('<tr>');
+              var cols = "";
+              cols += '<td>PO Number :'+i+'  </td>';
+              cols += '<td><input type="text" name="poname" style="width:100%"></td></tr>';
+              newRow.append(cols);
+              $("#insertPOTable").append(newRow);
+         }
+         
+    }
+     function showComments() {
+        $("#showComments").toggle();
+    }
+
+    function PoUploadTODatabase(requestcodId,noOfOper) {
+        var jsonObj = {};
+        jsonObj["RequestID"] = requestcodId;
+            var jsondataobj = [];
+            $('#insertPOTable  tr').each(function () {
+                var myData = {};
+                if ($(this).find('input[name="poname"]').val()!="") {
+                    myData["PoCatagoryName"] = $(this).find('input[name="poname"]').val();
+                    jsondataobj.push(myData);
+                }
+            });
+        jsonObj["LoadPoCatagories"] = jsondataobj;
+        if (jsonObj["LoadPoCatagories"].length != noOfOper) {
+            swal({
+                title: 'Enter all PO to field',
+                type: 'error',
+                closeOnCancel: true
+            });
+        } else {
+            var urlpath = '@Url.Action("SavePoAginistRequest", "SupplyChain")';
+            $.ajax({
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify(jsonObj),
+                    dataType: 'json',
+                    url: urlpath,
+                    type: "Post",
+                    async: true,
+                success: function (result) {
+                        if (result == true) {
+                            UpdateStartOrEnd(requestcodId, 11);
+                        } else {
+                            swal({
+                                title: 'Some Error Occoured',
+                                type: 'error',
+                                closeOnCancel: true
+                            });
+                        }
+
+                    },
+                    error: function () {
+                       swal({
+                                title: 'Server Error Please Try again',
+                                type: 'error',
+                                closeOnCancel: true
+                            });
+                    }
+                });
+        }
+
     }
 </script>
 
