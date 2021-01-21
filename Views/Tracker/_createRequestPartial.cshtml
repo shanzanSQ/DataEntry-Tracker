@@ -1,4 +1,5 @@
-﻿
+﻿<link href="~/Content/select2/dist/css/select2.min.css" rel="stylesheet" />
+
 <div>
     <div class="row" id="topDivition">
         <div class="col-md-6">
@@ -33,12 +34,12 @@
             </div>
             <div class="col-md-3">
                 <label for="loadseason">Season</label>
-                <select id="loadseason" class="form-control form-control-sm" onchange="colorChange('#loadseason')">
+                <select id="loadseason" style="width:100%" class="form-control select2" onchange="colorChange('#loadseason')">
                 </select>
             </div>
             <div class="col-md-3">
                 <label for="loadstyle">Style</label>
-                <select id="loadstyle" class="form-control form-control-sm">
+                <select id="loadstyle" style="width:100%" class="form-control select2 ">
                 </select>
             </div>
         </div>
@@ -52,7 +53,7 @@
             </div>
             <div class="col-md-12">
                 <label for="instructions">Instructions</label>
-                <textarea type="text" rows="2" style="resize:none"  class="form-control form-control-sm" id="instructions" />
+                <textarea type="text" rows="2" style="resize:none" class="form-control form-control-sm" id="instructions" />
             </div>
         </div>
         <br />
@@ -66,7 +67,9 @@
 
     </div>
 </div>
+<script src="~/Content/select2/dist/js/select2.min.js"></script>
 <script type="text/javascript">
+    $('.select2').select2();
     function addRequest() {
         $('#add_newRequest').show();
         $('#requestrivision').hide();
@@ -83,7 +86,7 @@
         } else {
             GetDetailsInformationBYRequestId($("#requestIdInput").val())
         }
-        
+
     });
 
     $('#loadbuyer').change(function () {
@@ -119,7 +122,7 @@
                     }
                 });
     }
-    
+
 
 
     function LoadSeasons(buyerId) {

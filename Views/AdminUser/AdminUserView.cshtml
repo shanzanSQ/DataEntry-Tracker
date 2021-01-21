@@ -10,9 +10,11 @@
                 <ul class="nav">
                     <li><a href="#" onclick="changeDiv(3)">Dashboard</a></li>
                     <li><a href="#" onclick="AllRequestById()">All Request</a></li>
+                    <li><a href="#" onclick="GetAdminPending(0)">All Task</a></li>
                     <li><a href="#" onclick="GetAdminPending(1)">Pending To Co ordinator</a></li>
                     <li><a href="#" onclick="GetAdminPending(2)">Assign To D.E.O</a></li>
                     <li><a href="#" onclick="GetAdminPending(8)">Closed List </a></li>
+                    <li><a href="#" onclick="changeDiv(5)">Report View</a></li>
                 </ul>
             </div>
             <div class="col-md-10">
@@ -95,7 +97,9 @@
                     }
             });
     }
-
+    function colorChange(elem) {
+        $(elem).css({ "border-color": "#d3d3d3" });
+    }
     function GetInformationBYRequest(requestId,reqCod,oper,revi) {
         var urlpath = '@Url.Action("GetCoordinatorFilesDatabase", "AdminUser")';
             $.ajax({
@@ -174,7 +178,20 @@
                         if (data) {
                             $('#admin_dashboard').empty();
                             $('#admin_dashboard').html(data);
-                            $('#pendigcotablelist').dataTable();
+                            $('#pendigcotablelist').dataTable(
+                                {
+                                    
+                                    lengthMenu: [
+                                        [10, 25, 50,-1],
+                                        ['10', '25', '50', 'All']
+                                    ],
+                                    
+                                    buttons: [
+                                        'copy',
+                                        'csv', 'excel', 'print'
+                                    ],
+                                }
+                            );
                         }
                     }
             });
@@ -219,5 +236,46 @@
                     }
                 }
                 });
+    }
+
+    function GetDataEntryReport() {
+        var formDate = $("#formdateinput").val();
+        var toDate = $("#todateInput").val();
+        if (formDate == "") {
+            $('#formdateinput').css({ "border-color": "#FF0000" });
+        } else if (toDate=="") {
+            $('#todateInput').css({ "border-color": "#FF0000" });
+        } else {
+            var urlpath = '@Url.Action("GetDataEntryReport", "AdminUser")';
+            $.ajax({
+                url: urlpath,
+                type: "Post",
+                data: { FormDate: formDate, ToDate: toDate },
+                    async: true,
+                    success: function(data) {
+                        if (data) {
+                            $('#reportPartialView').empty();
+                            $('#reportPartialView').html(data);
+                            $('#reportTable').dataTable(
+                                {     
+                                      dom: 'Blfrtip',
+                                      buttons: [
+                                          'copy',
+                                          'csv', 'excel', 'print'
+                                    ],
+                                      dom: 'Blfrtip',
+                                      lengthMenu: [
+                                          [-1,10, 25, 50],
+                                          ['All Rows','10', '25', '50']
+                                      ],
+                                   
+                                  
+                                }
+                            );
+                        }
+                    }
+            });
+        }
+
     }
 </script>

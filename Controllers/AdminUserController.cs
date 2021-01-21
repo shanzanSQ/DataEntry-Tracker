@@ -72,8 +72,19 @@ namespace DataEntry_Tracker.Controllers
                 return RedirectToAction("Index", "Account");
             }
             int userID = Convert.ToInt32(Session["TrackerUserId"].ToString());
-            List<CommonModel> commonlist = adminUserDal.GetAdminPending(userID,Status);
+            List<CommonModel> commonlist = adminUserDal.GetAdminPending(userID, Status);
             return PartialView("_adminTaskPartial", commonlist);
+        }
+        [HttpPost]
+        public ActionResult GetDataEntryReport(string FormDate,string ToDate)
+        {
+            if (Session["TrackerUserId"] == null)
+            {
+                return RedirectToAction("Index", "Account");
+            }
+            int userID = Convert.ToInt32(Session["TrackerUserId"].ToString());
+            List<ReportModel> Reportlist = adminUserDal.GetDataEntryReport(FormDate, ToDate);
+            return PartialView("_reportdataTableadmin", Reportlist);
         }
     }
 }

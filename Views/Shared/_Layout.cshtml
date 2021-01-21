@@ -6,9 +6,19 @@
     <title>@ViewBag.Title - SQ Data Entry Tracker</title>
     <link href="~/Content/sweetalert.css" rel="stylesheet" />
     <!-- DataTables -->
-    <link href="~/Content/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+    @*<link href="~/Content/datatables.net/jquery.dataTables.min.css" rel="stylesheet" />*@
+    <link href="~/Content/datatables.net-bs/css/buttons.dataTables.min.css" rel="stylesheet" />
 
+    <link href="~/Content/datatables.net-bs/css/dataTables.bootstrap.min.css" rel="stylesheet" />
     @*<link href="~/Content/datable.min.css" rel="stylesheet" />*@
+
+    <link href="~/Content/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
+    <style type="text/css">
+        body {
+            font-family: 'Roboto', sans-serif;
+            font-size: 12px;
+        }
+    </style>
     @Styles.Render("~/Content/bootstrap.min.css")
     @Scripts.Render("~/bundles/modernizr")
 </head>
@@ -100,9 +110,21 @@
         });
         });
     </script>
+    @*<script src="~/Content/datatables.net/js/jquery.dataTables.min.js"></script>*@
+    @*<script src="~/Content/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>*@
+
+
+    <script src="~/Scripts/sweetalert.min.js"></script>
     <script src="~/Content/datatables.net/js/jquery.dataTables.min.js"></script>
     <script src="~/Content/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
-    <script src="~/Scripts/sweetalert.min.js"></script>
+    <script src="~/Content/datatables.net/js/dataTables.buttons.min.js"></script>
+    <script src="~/Content/datatables.net/js/buttons.flash.min.js"></script>
+    <script src="~/Content/datatables.net/js/jszip.min.js"></script>
+    <script src="~/Content/datatables.net/js/pdfmake.min.js"></script>
+    <script src="~/Content/datatables.net/js/buttons.html5.min.js"></script>
+    <script src="~/Content/datatables.net/js/buttons.print.min.js"></script>
+
+
     @*<script src="~/Scripts/datatable.min.js"></script>*@
 </body>
 </html>

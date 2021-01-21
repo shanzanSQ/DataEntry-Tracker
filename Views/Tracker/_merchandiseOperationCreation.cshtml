@@ -257,7 +257,7 @@
             if ($('#selectrevision').val() == 1) {
                 oprationId = parseInt($('#baseOperations').val());
             } else {
-                oprationId = parseInt($('#baseOperations').val()) + 10;
+                oprationId = parseInt($('#baseOperations').val()) + 11;
             }
             var priority = $("#priority").val();
             var noOfTransections = $("#noofTransections").val();
@@ -293,7 +293,7 @@
                     var operation = parseInt($('#baseOperations').val());
                     uploadFiles('#uploadfiles', operation, $("#requestId").html(), $("#operationInstructions").val(), parseInt($("#rivisionNo").html()) + 1, "#showUploadedFiles");
                 } else if ($('#selectrevision').val() == 2) {
-                    var operation = parseInt($('#baseOperations').val()) + 10;
+                    var operation = parseInt($('#baseOperations').val()) + 11;
                     uploadFiles('#uploadfiles', operation, $("#requestId").html(), $("#operationInstructions").val(), parseInt($("#rivisionNo").html()) + 1, "#showUploadedFiles");
                 } else {
                     $('#selectrevision').css({ "border-color": "#FF0000" });

@@ -114,14 +114,14 @@
     else if (Model.Progressid == 6)
     {
         <div style="text-align:center">
-            <button type="button" class="btn btn-success btn-sm" onclick="UpdateOrClose(@Model.SupplyChainId,7)">Pending Payment</button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="UpdateOrClose(@Model.SupplyChainId,7)">Pending For Payment</button>
         </div>
 
     }
     else if (Model.Progressid == 7)
     {
         <div style="text-align:center">
-            <button type="button" class="btn btn-success btn-sm"  onclick="UpdateOrClose(@Model.SupplyChainId,8)">Payment Complete</button>
+            <button type="button" class="btn btn-success btn-sm"  onclick="UpdateOrClose(@Model.SupplyChainId,8)">Payment Completed</button>
         </div>
 
     }

@@ -143,7 +143,13 @@
             <div class="row" id="insertPO" style="display:none">
                 <div class="col-md-6">
                     <table id="insertPOTable" width="100%" border="1">
+                        <tr>
+                            <td>Po Number : </td>
+                            <td><input type="text" name="poname" style="width:100%"></td>
+                        </tr>
                     </table>
+                    <br />
+                    <button type="button" style="display:inline-block" class="btn btn-primary btn-sm" onclick="addPoRow()">Add Row</button>
                 </div>
                 <div class="col-md-6">
                     <button type="button" style="display:inline-block" class="btn btn-success btn-sm" onclick="PoUploadTODatabase(@Model.RequestCodId,@Model.NoOfTransections)">PO Update and Complete</button>
@@ -156,7 +162,7 @@
                 <tr>
                     <td width="25%"><button type="button" style="width:95%" class="btn btn-info btn-sm" onclick="showComments()">Comments</button></td>
                     <td width="25%"><input type="file" id="attachcompleteFile" style="width:95%" class="btn btn-success btn-sm" onchange="uploadFiles('#attachcompleteFile',@Model.BaseOperationId, @Model.RequestId,'Completed File',@Model.RivisionNo, '#modalfilelist');" /></td>
-                    <td width="25%"><button type="button" style="background-color:yellow;width:95%" class="btn btn-default btn-sm" onclick="UpdateStartOrEnd(@Model.RequestCodId,4)">Pause</button></td>
+                    <td width="25%"><button type="button" style="background-color:yellow;width:95%" data-toggle="modal_preview" class="btn btn-default btn-sm" onclick="UpdateStartOrEnd(@Model.RequestCodId,4)">Pause</button></td>
                     <td width="25%"><button type="button" style="width:95%" class="btn btn-success  btn-sm" onclick="UpdateStartOrEnd(@Model.RequestCodId,11)">Complete</button></td>
                 </tr>
             </table>

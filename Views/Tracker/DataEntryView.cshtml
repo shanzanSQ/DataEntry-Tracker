@@ -3,13 +3,12 @@
     ViewBag.Title = "DataEntryView";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-    <style type="text/css">
-        .active {
-            background-color: #f1f1f1;
-        }
-    </style>
+<style type="text/css">
+    .active {
+        background-color: #f1f1f1;
+    }
+</style>
 <link href="~/Content/coordinatorstyle.css" rel="stylesheet" />
-<font size="2" face="Calibri">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-2">
@@ -70,8 +69,7 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
-</font>
-<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+@Scripts.Render("~/bundles/jquery")
 <script type="text/javascript">
     var t;
     $('li > a').click(function() {
@@ -343,7 +341,7 @@
                     }
                 });
         }
-        
+
     }
      function CommentsTable(requestId) {
             var urlpath = '@Url.Action("ReadAllComments", "Tracker")';
@@ -364,23 +362,27 @@
                                 newRow.append(cols);
                                 $("#coordinatorComments").append(newRow);
                             }
-                            
+
                         }
                     }
-                });    
+                });
     }
      function AddPO(nooftrans) {
          $("#addPOdiv").hide();
          $("#insertPO").show();
-        for (var i = 1; i <=nooftrans;i++) {
-              var newRow = $('<tr>');
+    }
+    function addPoRow() {
+         var newRow = $('<tr>');
               var cols = "";
-              cols += '<td>PO Number :'+i+'  </td>';
-              cols += '<td><input type="text" name="poname" style="width:100%"></td></tr>';
+              cols += '<td>PO Number : </td>';
+              cols += '<td><input type="text" name="poname" style="width:100%"></td>';
+              cols += '<td><input type="button" onclick="deletePoRow(this)" name="deletePo" class="btn-danger" value="X" style="width:100%"></td></tr>';
               newRow.append(cols);
               $("#insertPOTable").append(newRow);
-         }
-         
+    }
+    function deletePoRow(r) {
+       var i = r.parentNode.parentNode.rowIndex;
+        document.getElementById("insertPOTable").deleteRow(i);
     }
      function showComments() {
         $("#showComments").toggle();
@@ -394,11 +396,13 @@
                 var myData = {};
                 if ($(this).find('input[name="poname"]').val()!="") {
                     myData["PoCatagoryName"] = $(this).find('input[name="poname"]').val();
-                    jsondataobj.push(myData);
+                    if (myData["PoCatagoryName"] != "") {
+                        jsondataobj.push(myData);
+                    }
                 }
             });
         jsonObj["LoadPoCatagories"] = jsondataobj;
-        if (jsonObj["LoadPoCatagories"].length != noOfOper) {
+        if (jsonObj["LoadPoCatagories"].length == 0) {
             swal({
                 title: 'Enter all PO to field',
                 type: 'error',
