@@ -1,5 +1,6 @@
 ﻿using DataEntry_Tracker.DataManager;
 using DataEntry_Tracker.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -119,6 +120,49 @@ namespace DataEntry_Tracker.DAL
                     commonModelList.Add(common);
                 }
                 return commonModelList;
+            }
+            catch (Exception e)
+            {
+                accessManager.SqlConnectionClose(true);
+                throw e;
+            }
+            finally
+            {
+                accessManager.SqlConnectionClose();
+            }
+        }
+        public List<ReportModel> GetDataEntryReport(string FromDate, string ToDate)
+        {
+            List<ReportModel> reportmodellist = new List<ReportModel>();
+            try
+            {
+                accessManager.SqlConnectionOpen(DataBase.DataEntryTracker);
+                List<SqlParameter> aParameters = new List<SqlParameter>();
+                aParameters.Add(new SqlParameter("@FromDate", FromDate));
+                aParameters.Add(new SqlParameter("@ToDate", ToDate));
+                SqlDataReader dr = accessManager.GetSqlDataReader("sp_ReportDataEntryTracker", aParameters);
+                while (dr.Read())
+                {
+                    ReportModel reportmodel = new ReportModel();
+                    reportmodel.RequestId = dr["RequestCooRID"].ToString();
+                    reportmodel.UnitName = dr["UnitName"].ToString();
+                    reportmodel.BuyerName = dr["BuyerName"].ToString();
+                    reportmodel.RequestBY = dr["RequestBY"].ToString();
+                    reportmodel.CoOrdinateBy = dr["CoOrdinateBy"].ToString();
+                    reportmodel.AssignTo = dr["AssignTo"].ToString();
+                    reportmodel.BaseOperationName = dr["BaseOperationName"].ToString();
+                    reportmodel.NoOfTransections = dr["NoOfTransections"].ToString();
+                    reportmodel.RequestTime = dr["RequestTime"].ToString();
+                    reportmodel.TotalTime = dr["TotalTime"].ToString();
+                    reportmodel.Return = dr["Return"].ToString();
+                    reportmodel.RequestedDate= dr["RequestedDate"].ToString();
+                    reportmodel.DataEntryStartTime= dr["DataEntryStartTime"].ToString();
+                    reportmodel.DataEntryEndTime = dr["DataEntryEndTime"].ToString();
+                    reportmodel.Priority = dr["Priority"].ToString();
+                    reportmodel.Status = dr["Status"].ToString();
+                    reportmodellist.Add(reportmodel);
+                }
+                return reportmodellist;
             }
             catch (Exception e)
             {

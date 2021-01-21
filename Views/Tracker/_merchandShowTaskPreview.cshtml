@@ -36,6 +36,10 @@
                 <td>@Model.UserName</td>
             </tr>
             <tr>
+                <th># Transaction</th>
+                <td>@Model.NoOfTransections</td>
+            </tr>
+            <tr>
                 <th>Assign Time</th>
                 <td>
                     @if (Model.CoUpdatedBy != "")
@@ -82,7 +86,7 @@
                         <td style="color:green">Update</td>
                         break;
                     case 8:
-                    <td style="color:green">Closed</td>
+                        <td style="color:green">Closed</td>
                         break;
                     case 11:
                         <td style="color:green">D.E.O Complete</td>

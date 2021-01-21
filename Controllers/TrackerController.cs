@@ -456,6 +456,9 @@ namespace DataEntry_Tracker.Controllers
                 case 4:
                     viewName = "_addFilesLog";
                     break;
+                case 5:
+                    viewName = "_ReportPartialView";
+                    break;
             }
             return PartialView(viewName);
         }

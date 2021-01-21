@@ -1,0 +1,48 @@
+﻿@model IEnumerable<DataEntry_Tracker.Models.ReportModel>
+<div class="box" style="overflow-x:auto;" >
+    <table id="reportTable" border="1" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Task Id</th>
+                <th>Unit Name</th>
+                <th>Buyer Name</th>
+                <th>Request BY</th>
+                <th>CoOrdinate By</th>
+                <th>Assign To</th>
+                <th>Operation Name</th>
+                <th># Transactions</th>
+                <th>Request Time</th>
+                <th>Total Time</th>
+                <th>Return</th>
+                <th>Requested Date</th>
+                <th>Entry Start Time</th>
+                <th>Entry End Time</th>
+                <th>Priority</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.RequestId</td>
+                    <td>@item.UnitName</td>
+                    <td>@item.BuyerName</td>
+                    <td>@item.RequestBY</td>
+                    <td>@item.CoOrdinateBy</td>
+                    <td>@item.AssignTo</td>
+                    <td>@item.BaseOperationName</td>
+                    <td>@item.NoOfTransections</td>
+                    <td>@item.RequestTime</td>
+                    <td>@item.TotalTime</td>
+                    <td>@item.Return</td>
+                    <td>@item.RequestedDate</td>
+                    <td>@item.DataEntryStartTime</td>
+                    <td>@item.DataEntryEndTime</td>
+                    <td>@item.Priority</td>
+                    <td>@item.Status</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
